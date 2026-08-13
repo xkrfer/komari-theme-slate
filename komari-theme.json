@@ -2,8 +2,8 @@
   "name": { "zh-CN": "Slate", "en": "Slate" },
   "short": "Slate",
   "description": {
-    "zh-CN": "石板克制、表优先的 Komari 主题",
-    "en": "A stone-quiet, table-first theme for Komari"
+    "zh-CN": "简洁克制的 Komari 主题，首页默认表格",
+    "en": "A restrained Komari theme with a table-first home"
   },
   "version": "0.1.0",
   "author": "DouDou",
