@@ -189,9 +189,9 @@ export function NodeCards({
             >
               <CardHeader className="h-29 px-4 py-4">
                 <CardTitle className="flex items-start justify-between gap-3">
-                  <span className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex min-w-0 items-start gap-2.5">
                     <span
-                      className="flex size-7 shrink-0 items-center justify-center text-lg"
+                      className="flex h-5 w-7 shrink-0 items-center justify-center text-lg leading-5"
                       role="img"
                       aria-label={row.region || t("colRegion")}
                     >
