@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
@@ -6,11 +7,21 @@ import { defineConfig, loadEnv } from "vite";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+  const themeManifest = JSON.parse(
+    readFileSync(new URL("./komari-theme.json", import.meta.url), "utf8"),
+  ) as { version: string };
+  const themeVersion =
+    process.env.VITE_THEME_VERSION ||
+    env.VITE_THEME_VERSION ||
+    themeManifest.version;
   const target = env.VITE_API_TARGET || "http://127.0.0.1:25774";
   const targetOrigin = new URL(target).origin;
 
   return {
     base: "/",
+    define: {
+      __THEME_VERSION__: JSON.stringify(themeVersion),
+    },
     plugins: [
       tanstackRouter({
         target: "react",

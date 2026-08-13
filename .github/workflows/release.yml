@@ -1,0 +1,82 @@
+name: Release theme
+
+run-name: Release v${{ inputs.version }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "SemVer without v prefix, for example 1.2.3"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and release theme
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      VITE_THEME_VERSION: ${{ inputs.version }}
+      ZIP_NAME: komari-theme-slate-v${{ inputs.version }}.zip
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Validate and apply version
+        run: node scripts/set-release-version.mjs "$RELEASE_VERSION"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check project
+        run: |
+          pnpm typecheck
+          pnpm lint
+
+      - name: Build theme
+        run: pnpm build
+
+      - name: Package theme
+        run: node scripts/package.mjs
+
+      - name: Verify package
+        run: |
+          test -f "$ZIP_NAME"
+          unzip -p "$ZIP_NAME" komari-theme.json | grep -F "\"version\": \"$RELEASE_VERSION\""
+          unzip -l "$ZIP_NAME" | grep -F "dist/index.html"
+
+      - name: Create GitHub Release
+        shell: bash
+        run: |
+          release_flags=()
+          if [[ "$RELEASE_VERSION" == *-* ]]; then
+            release_flags+=(--prerelease)
+          fi
+
+          gh release create "v$RELEASE_VERSION" "$ZIP_NAME" \
+            --target "$GITHUB_SHA" \
+            --title "v$RELEASE_VERSION" \
+            --generate-notes \
+            "${release_flags[@]}"

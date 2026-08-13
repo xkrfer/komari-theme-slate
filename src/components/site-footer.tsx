@@ -1,6 +1,5 @@
 import { useServerVersion } from "@/hooks/use-komari";
 import { t } from "@/lib/i18n";
-import themeManifest from "../../komari-theme.json";
 
 const THEME_URL = "https://github.com/xkrfer/komari-theme-slate";
 const KOMARI_URL = "https://github.com/komari-monitor/komari";
@@ -46,7 +45,7 @@ export function SiteFooter({ sitename }: { sitename: string }) {
             rel="noreferrer"
             className="cursor-pointer text-foreground/75 underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
           >
-            {t("footerTheme")} v{themeManifest.version}
+            {t("footerTheme")} v{__THEME_VERSION__}
           </a>
         </p>
       </div>
