@@ -66,3 +66,23 @@ export async function rpcCall<T>(
 export async function rpcPing(): Promise<string> {
   return rpcCall<string>("rpc.ping");
 }
+
+export type ServerVersion = {
+  version: string;
+  hash: string;
+};
+
+export async function rpcServerVersion(): Promise<ServerVersion> {
+  const result = await rpcCall<unknown>("public:getVersion");
+  if (!result || typeof result !== "object") {
+    throw new RpcError("Invalid server version payload");
+  }
+
+  const version = "version" in result ? result.version : undefined;
+  const hash = "hash" in result ? result.hash : undefined;
+  if (typeof version !== "string" || typeof hash !== "string") {
+    throw new RpcError("Invalid server version payload");
+  }
+
+  return { version, hash };
+}

@@ -7,6 +7,7 @@ import { defineConfig, loadEnv } from "vite";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const target = env.VITE_API_TARGET || "http://127.0.0.1:25774";
+  const targetOrigin = new URL(target).origin;
 
   return {
     base: "./",
@@ -55,6 +56,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: true,
           ws: false,
+          configure(proxy) {
+            proxy.on("proxyReq", (proxyRequest) => {
+              proxyRequest.setHeader("Origin", targetOrigin);
+            });
+          },
         },
       },
     },

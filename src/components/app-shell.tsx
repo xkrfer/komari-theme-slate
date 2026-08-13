@@ -37,7 +37,7 @@ export function AppShell() {
         }}
       />
       <Outlet />
-      <SiteFooter />
+      <SiteFooter sitename={publicInfo.data?.sitename ?? "Slate"} />
       <Toaster />
     </div>
   );

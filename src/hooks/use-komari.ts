@@ -8,7 +8,7 @@ import {
   getPublicInfo,
   getPublicPingTasks,
 } from "@/lib/api";
-import { rpcPing } from "@/lib/rpc";
+import { rpcPing, rpcServerVersion } from "@/lib/rpc";
 import { nodeStatusSchema } from "@/lib/schemas";
 
 export const queryKeys = {
@@ -18,6 +18,7 @@ export const queryKeys = {
   status: ["nodesLatestStatus"] as const,
   pingTasks: ["pingTasks"] as const,
   pingStats: ["pingStats"] as const,
+  serverVersion: ["serverVersion"] as const,
 };
 
 export function usePublicInfo() {
@@ -67,6 +68,15 @@ export function useRpcHealth() {
     queryKey: ["rpcPing"],
     queryFn: rpcPing,
     retry: 1,
+  });
+}
+
+export function useServerVersion() {
+  return useQuery({
+    queryKey: queryKeys.serverVersion,
+    queryFn: rpcServerVersion,
+    retry: false,
+    staleTime: Number.POSITIVE_INFINITY,
   });
 }
 
