@@ -16,8 +16,10 @@ export function SiteFooter({ sitename }: { sitename: string }) {
           © {new Date().getFullYear()} {displayName}
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-0.5">
+        <div className="flex items-center justify-center gap-0.5">
           <p>Powered by Komari Monitor.</p>
+          {/* 点线分隔 */}
+          <span className="text-foreground/75">·</span>
           <p className="flex items-center justify-center gap-1.5">
             <span>Made with</span>
             <span aria-label="love" role="img">
