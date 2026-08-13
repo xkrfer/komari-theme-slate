@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Activity, Languages, Monitor, Moon, Search, Sun } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { useLanguage } from "@/components/language-provider";
@@ -39,7 +40,7 @@ export function SiteHeader({
   return (
     <header className="km-navbar bg-background/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
-        <a href="./" className="flex min-w-0 items-center gap-2.5">
+        <Link to="/" className="flex min-w-0 items-center gap-2.5">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-sm bg-primary text-primary-foreground shadow-sm">
             <Activity className="size-4" />
           </span>
@@ -51,7 +52,7 @@ export function SiteHeader({
               Monitoring
             </span>
           </span>
-        </a>
+        </Link>
         <div className="flex items-center gap-1.5">
           <Suspense
             fallback={

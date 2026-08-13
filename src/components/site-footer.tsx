@@ -17,13 +17,16 @@ export function SiteFooter({ sitename }: { sitename: string }) {
           © {new Date().getFullYear()} {displayName}
         </p>
 
-        <p className="flex items-center justify-center gap-1.5">
-          <span>Made with</span>
-          <span aria-label="love" role="img">
-            ❤️
-          </span>
-          <span>for Komari</span>
-        </p>
+        <div className="flex flex-col items-center justify-center gap-0.5">
+          <p>Powered by Komari Monitor.</p>
+          <p className="flex items-center justify-center gap-1.5">
+            <span>Made with</span>
+            <span aria-label="love" role="img">
+              ❤️
+            </span>
+            <span>for Komari</span>
+          </p>
+        </div>
 
         <p className="flex items-center justify-center gap-1.5 font-mono text-[10px] sm:justify-end">
           {backendVersion ? (

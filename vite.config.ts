@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
   const targetOrigin = new URL(target).origin;
 
   return {
-    base: "./",
+    base: "/",
     plugins: [
       tanstackRouter({
         target: "react",
