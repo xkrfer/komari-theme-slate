@@ -15,6 +15,22 @@ for (const file of required) {
 const manifest = JSON.parse(
   readFileSync(resolve(root, "komari-theme.json"), "utf8"),
 );
+
+for (const field of [
+  "name",
+  "short",
+  "description",
+  "version",
+  "author",
+  "url",
+  "preview",
+]) {
+  if (typeof manifest[field] !== "string") {
+    console.error(`invalid komari-theme.json: ${field} must be a string`);
+    process.exit(1);
+  }
+}
+
 const version = process.env.VITE_THEME_VERSION || manifest.version;
 if (manifest.version !== version) {
   console.error(
