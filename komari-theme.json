@@ -1,0 +1,40 @@
+{
+  "name": { "zh-CN": "Slate", "en": "Slate" },
+  "short": "Slate",
+  "description": {
+    "zh-CN": "石板克制、表优先的 Komari 主题",
+    "en": "A stone-quiet, table-first theme for Komari"
+  },
+  "version": "0.1.0",
+  "author": "DouDou",
+  "url": "https://github.com/doudou/komari-theme-slate",
+  "preview": "preview.png",
+  "configuration": {
+    "type": "managed",
+    "name": { "zh-CN": "Slate 设置", "en": "Slate Settings" },
+    "data": [
+      {
+        "key": "defaultAppearance",
+        "name": { "zh-CN": "默认外观", "en": "Default appearance" },
+        "type": "select",
+        "options": "system,light,dark",
+        "default": "system",
+        "help": {
+          "zh-CN": "访客未设置本地外观时使用",
+          "en": "Used when the visitor has no local appearance"
+        }
+      },
+      {
+        "key": "defaultView",
+        "name": { "zh-CN": "访客默认视图", "en": "Visitor default view" },
+        "type": "select",
+        "options": "table,cards,map",
+        "default": "table",
+        "help": {
+          "zh-CN": "仅约束桌面首次访问；手机仍默认卡片",
+          "en": "Desktop first visit only; mobile still defaults to cards"
+        }
+      }
+    ]
+  }
+}

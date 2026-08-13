@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" role="img" aria-label="Slate">
+  <title>Slate</title>
+  <rect width="32" height="32" rx="6" fill="#1c1917"/>
+  <path
+    d="M28 16h-3.31a2.67 2.67 0 0 0-2.57 1.95l-3.13 11.14a.33.33 0 0 1-.64 0L10.99 2.91a.33.33 0 0 0-.64 0L7.21 14.05A2.67 2.67 0 0 1 4.65 16H4"
+    stroke="#fafaf9"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
