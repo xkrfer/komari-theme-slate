@@ -11,6 +11,10 @@
     "name": { "zh-CN": "Slate 设置", "en": "Slate Settings" },
     "data": [
       {
+        "type": "title",
+        "name": { "zh-CN": "基础设置", "en": "General" }
+      },
+      {
         "key": "defaultAppearance",
         "name": { "zh-CN": "默认外观", "en": "Default appearance" },
         "type": "select",
@@ -30,6 +34,108 @@
         "help": {
           "zh-CN": "仅约束桌面首次访问；手机仍默认卡片",
           "en": "Desktop first visit only; mobile still defaults to cards"
+        }
+      },
+      {
+        "key": "defaultLanguage",
+        "name": { "zh-CN": "默认语言", "en": "Default language" },
+        "type": "select",
+        "options": "auto,zh-CN,en",
+        "default": "auto",
+        "help": {
+          "zh-CN": "访客未设置本地语言时使用；auto 跟随浏览器语言",
+          "en": "Used when the visitor has no local language; auto follows the browser"
+        }
+      },
+      {
+        "key": "defaultSort",
+        "name": { "zh-CN": "节点默认排序", "en": "Default node sort" },
+        "type": "select",
+        "options": "name,status,region,uptime,cpu,memory,disk,speed",
+        "default": "name"
+      },
+      {
+        "type": "title",
+        "name": { "zh-CN": "首页", "en": "Home page" }
+      },
+      {
+        "key": "showStats",
+        "name": { "zh-CN": "显示顶部统计卡片", "en": "Show summary cards" },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "enableMap",
+        "name": { "zh-CN": "启用地图视图", "en": "Enable map view" },
+        "type": "switch",
+        "default": true,
+        "help": {
+          "zh-CN": "关闭后将隐藏地图入口，并自动回退到可用视图",
+          "en": "Hides the map entry and falls back to an available view when disabled"
+        }
+      },
+      {
+        "type": "title",
+        "name": { "zh-CN": "节点卡片", "en": "Node cards" }
+      },
+      {
+        "key": "showCardTags",
+        "name": { "zh-CN": "显示节点标签", "en": "Show node tags" },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showCardBilling",
+        "name": { "zh-CN": "显示账单信息", "en": "Show billing information" },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showResourceTotals",
+        "name": {
+          "zh-CN": "显示资源已用与总量",
+          "en": "Show resource usage totals"
+        },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showCardTraffic",
+        "name": { "zh-CN": "显示网络流量", "en": "Show network traffic" },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "key": "showCardSwap",
+        "name": { "zh-CN": "显示 Swap 指标", "en": "Show Swap metric" },
+        "type": "switch",
+        "default": true
+      },
+      {
+        "type": "title",
+        "name": { "zh-CN": "游客显示", "en": "Guest display" }
+      },
+      {
+        "key": "guestShowPrice",
+        "name": { "zh-CN": "向游客显示价格", "en": "Show prices to guests" },
+        "type": "switch",
+        "default": false,
+        "help": {
+          "zh-CN": "登录用户不受此选项影响",
+          "en": "This option does not affect signed-in users"
+        }
+      },
+      {
+        "key": "guestShowExpiration",
+        "name": {
+          "zh-CN": "向游客显示到期状态",
+          "en": "Show expiration to guests"
+        },
+        "type": "switch",
+        "default": false,
+        "help": {
+          "zh-CN": "登录用户不受此选项影响",
+          "en": "This option does not affect signed-in users"
         }
       }
     ]

@@ -315,6 +315,13 @@ export function readLocale(): Locale {
   return "zh-CN";
 }
 
+export function resolveDefaultLocale(preference: "auto" | Locale): Locale {
+  if (preference !== "auto") {
+    return preference;
+  }
+  return navigator.language.toLowerCase().startsWith("zh") ? "zh-CN" : "en";
+}
+
 export function writeLocale(locale: Locale) {
   localStorage.setItem(LANGUAGE_KEY, locale);
 }

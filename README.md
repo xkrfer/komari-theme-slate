@@ -91,14 +91,16 @@ These are for local development and packaging only. After the theme is deployed 
 
 ## Theme settings
 
-`komari-theme.json` declares two settings managed in the Komari admin panel:
+`komari-theme.json` declares settings managed in the Komari admin panel:
 
-| Key | Options | Default | Notes |
-| --- | --- | --- | --- |
-| `defaultAppearance` | `system` / `light` / `dark` | `system` | Used when the visitor has not set a local appearance |
-| `defaultView` | `table` / `cards` / `map` | `table` | Desktop first visit only; mobile still defaults to cards |
+| Group | Settings |
+| --- | --- |
+| General | Default appearance, view, language, and node sort |
+| Home page | Summary cards and map view |
+| Node cards | Tags, billing, resource totals, network traffic, and Swap |
+| Guest display | Prices and expiration status |
 
-After a visitor picks a value, it is stored locally (`appearance`, `slate:view`) and takes priority afterwards.
+Visitor choices for appearance, language, and view are stored locally (`appearance`, `language`, `slate:view`) and take priority afterwards. Guest prices and expiration status are hidden by default; signed-in users are unaffected by those two settings. Disabling the map automatically falls back from a stored map view to an available view.
 
 ## Build and package
 

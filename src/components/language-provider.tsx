@@ -18,6 +18,7 @@ import {
 type LanguageProviderState = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
+  setDefaultLocale: (locale: Locale) => void;
 };
 
 const LanguageContext = createContext<LanguageProviderState | undefined>(
@@ -29,6 +30,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLocale = useCallback((nextLocale: Locale) => {
     writeLocale(nextLocale);
+    setLocaleState(nextLocale);
+  }, []);
+
+  const setDefaultLocale = useCallback((nextLocale: Locale) => {
     setLocaleState(nextLocale);
   }, []);
 
@@ -48,7 +53,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);
+  const value = useMemo(
+    () => ({ locale, setDefaultLocale, setLocale }),
+    [locale, setDefaultLocale, setLocale],
+  );
 
   return (
     <LanguageContext.Provider value={value}>

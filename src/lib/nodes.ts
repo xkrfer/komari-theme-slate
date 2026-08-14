@@ -18,6 +18,7 @@ export type NodeRow = {
   cpuUsage: number | null;
   memoryUsage: number | null;
   diskUsage: number | null;
+  swapUsage: number | null;
   client: Client;
   status: NodeStatus | undefined;
 };
@@ -68,6 +69,7 @@ export function buildNodeRows(
     const online = status?.online ?? false;
     const memoryTotal = status?.ram_total || client.mem_total;
     const diskTotal = status?.disk_total || client.disk_total;
+    const swapTotal = status?.swap_total || client.swap_total;
     return {
       uuid: client.uuid,
       name: client.name || client.uuid,
@@ -86,6 +88,7 @@ export function buildNodeRows(
       cpuUsage: online ? clampPercent(status?.cpu ?? 0) : null,
       memoryUsage: online ? usagePercent(status?.ram ?? 0, memoryTotal) : null,
       diskUsage: online ? usagePercent(status?.disk ?? 0, diskTotal) : null,
+      swapUsage: online ? usagePercent(status?.swap ?? 0, swapTotal) : null,
       client,
       status,
     };

@@ -6,15 +6,12 @@ import { NodeCards } from "@/components/node-cards";
 import { NodeFilters } from "@/components/node-filters";
 import { NodeMap } from "@/components/node-map";
 import { NodeTable } from "@/components/node-table";
-import {
-  type NodeSort,
-  SortControl,
-  type SortDirection,
-} from "@/components/sort-control";
+import { SortControl, type SortDirection } from "@/components/sort-control";
 import { StatsStrip, type StatusFilter } from "@/components/stats-strip";
 import { ViewSwitcher } from "@/components/view-switcher";
 import {
   useLiveStatus,
+  useMe,
   useNodeStatus,
   useNodes,
   usePublicInfo,
@@ -23,19 +20,23 @@ import {
 import { t } from "@/lib/i18n";
 import { buildNodeRows } from "@/lib/nodes";
 import { isRpcUnavailable } from "@/lib/rpc";
-import type { HomeView } from "@/lib/schemas";
-import { resolveHomeView, writeStoredView } from "@/lib/view";
+import type { HomeView, NodeSort } from "@/lib/schemas";
+import { readStoredView, resolveHomeView, writeStoredView } from "@/lib/view";
 
 export function HomePage() {
   const publicInfo = usePublicInfo();
   const nodes = useNodes();
   const status = useNodeStatus();
+  const me = useMe();
   const health = useRpcHealth();
   useLiveStatus();
 
-  const managedView = publicInfo.data?.theme_settings.defaultView ?? "table";
+  const settings = publicInfo.data?.theme_settings;
+  const managedView = settings?.defaultView ?? "table";
+  const enableMap = settings?.enableMap ?? true;
+  const managedSort = settings?.defaultSort ?? "name";
   const [view, setView] = useState<HomeView>(() =>
-    resolveHomeView(managedView),
+    resolveHomeView(managedView, enableMap),
   );
   const [group, setGroup] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -43,10 +44,20 @@ export function HomePage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   useEffect(() => {
-    if (!localStorage.getItem("slate:view")) {
-      setView(resolveHomeView(managedView));
-    }
-  }, [managedView]);
+    setView((currentView) => {
+      if (currentView === "map" && !enableMap) {
+        return resolveHomeView(managedView, false);
+      }
+      if (!readStoredView()) {
+        return resolveHomeView(managedView, enableMap);
+      }
+      return currentView;
+    });
+  }, [enableMap, managedView]);
+
+  useEffect(() => {
+    setSort(managedSort);
+  }, [managedSort]);
 
   useEffect(() => {
     if (health.isError && isRpcUnavailable(health.error)) {
@@ -54,6 +65,7 @@ export function HomePage() {
     }
   }, [health.error, health.isError]);
 
+  const activeView = view === "map" && !enableMap ? "table" : view;
   const rows = useMemo(
     () => buildNodeRows(nodes.data ?? [], status.data),
     [nodes.data, status.data],
@@ -64,7 +76,7 @@ export function HomePage() {
   );
   const visible = useMemo(() => {
     const filtered = rows.filter((row) => {
-      if (view !== "map" && group && row.group !== group) {
+      if (activeView !== "map" && group && row.group !== group) {
         return false;
       }
       if (statusFilter === "online" && !row.online) {
@@ -75,7 +87,7 @@ export function HomePage() {
       }
       return true;
     });
-    if (view === "map") {
+    if (activeView === "map") {
       return filtered;
     }
     const direction = sortDirection === "asc" ? 1 : -1;
@@ -108,7 +120,7 @@ export function HomePage() {
       }
       return (a.netIn + a.netOut - (b.netIn + b.netOut)) * direction;
     });
-  }, [group, rows, sort, sortDirection, statusFilter, view]);
+  }, [activeView, group, rows, sort, sortDirection, statusFilter]);
   const error = nodes.isError || publicInfo.isError;
   const loading = nodes.isPending || publicInfo.isPending || status.isPending;
 
@@ -130,12 +142,14 @@ export function HomePage() {
           <HomeLoading />
         ) : (
           <>
-            <StatsStrip
-              rows={rows}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-            />
-            <section className="mt-10">
+            {(settings?.showStats ?? true) ? (
+              <StatsStrip
+                rows={rows}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+              />
+            ) : null}
+            <section className={(settings?.showStats ?? true) ? "mt-10" : ""}>
               <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <h2 className="text-base font-semibold tracking-tight">
@@ -146,7 +160,7 @@ export function HomePage() {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  {view === "map" ? null : (
+                  {activeView === "map" ? null : (
                     <>
                       <NodeFilters
                         groups={groups}
@@ -162,7 +176,8 @@ export function HomePage() {
                     </>
                   )}
                   <ViewSwitcher
-                    value={view}
+                    value={activeView}
+                    showMap={enableMap}
                     onChange={(next) => {
                       writeStoredView(next);
                       setView(next);
@@ -193,15 +208,29 @@ export function HomePage() {
                     {t("noNodesDescription")}
                   </p>
                 </div>
-              ) : view === "table" ? (
+              ) : activeView === "table" ? (
                 <NodeTable
                   rows={visible}
                   sortKey={`${sort}:${sortDirection}`}
                 />
-              ) : view === "cards" ? (
+              ) : activeView === "cards" ? (
                 <NodeCards
                   rows={visible}
                   sortKey={`${sort}:${sortDirection}`}
+                  options={{
+                    showTags: settings?.showCardTags ?? true,
+                    showPrice:
+                      (settings?.showCardBilling ?? true) &&
+                      (Boolean(me.data?.logged_in) ||
+                        Boolean(settings?.guestShowPrice)),
+                    showExpiration:
+                      (settings?.showCardBilling ?? true) &&
+                      (Boolean(me.data?.logged_in) ||
+                        Boolean(settings?.guestShowExpiration)),
+                    showResourceTotals: settings?.showResourceTotals ?? true,
+                    showTraffic: settings?.showCardTraffic ?? true,
+                    showSwap: settings?.showCardSwap ?? true,
+                  }}
                 />
               ) : (
                 <NodeMap rows={visible} />

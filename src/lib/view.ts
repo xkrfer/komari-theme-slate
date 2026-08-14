@@ -19,13 +19,16 @@ export function writeStoredView(view: HomeView): void {
   localStorage.setItem(VIEW_STORAGE_KEY, view);
 }
 
-export function resolveHomeView(managedDefault: HomeView): HomeView {
+export function resolveHomeView(
+  managedDefault: HomeView,
+  enableMap = true,
+): HomeView {
   const stored = readStoredView();
-  if (stored) {
+  if (stored && (stored !== "map" || enableMap)) {
     return stored;
   }
   if (isMobileViewport()) {
     return "cards";
   }
-  return managedDefault;
+  return managedDefault === "map" && !enableMap ? "table" : managedDefault;
 }

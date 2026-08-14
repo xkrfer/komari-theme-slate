@@ -9,16 +9,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { t } from "@/lib/i18n";
+import type { NodeSort } from "@/lib/schemas";
 
-export type NodeSort =
-  | "name"
-  | "status"
-  | "region"
-  | "uptime"
-  | "cpu"
-  | "memory"
-  | "disk"
-  | "speed";
 export type SortDirection = "asc" | "desc";
 
 function getSortLabel(value: NodeSort) {

@@ -13,6 +13,7 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  setDefaultTheme: (theme: Theme) => void;
 };
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)";
@@ -81,6 +82,10 @@ export function ThemeProvider({
     [storageKey],
   );
 
+  const setDefaultTheme = React.useCallback((nextTheme: Theme) => {
+    setThemeState(nextTheme);
+  }, []);
+
   const applyTheme = React.useCallback(
     (nextTheme: Theme) => {
       const root = document.documentElement;
@@ -148,8 +153,9 @@ export function ThemeProvider({
     () => ({
       theme,
       setTheme,
+      setDefaultTheme,
     }),
-    [theme, setTheme],
+    [theme, setDefaultTheme, setTheme],
   );
 
   return (

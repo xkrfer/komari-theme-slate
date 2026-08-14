@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowDown,
+  ArrowLeftRight,
   ArrowUp,
   Cpu,
   HardDrive,
@@ -137,12 +138,23 @@ function UsageMetric({
   );
 }
 
+type NodeCardOptions = {
+  showTags: boolean;
+  showPrice: boolean;
+  showExpiration: boolean;
+  showResourceTotals: boolean;
+  showTraffic: boolean;
+  showSwap: boolean;
+};
+
 export function NodeCards({
   rows,
   sortKey,
+  options,
 }: {
   rows: NodeRow[];
   sortKey: string;
+  options: NodeCardOptions;
 }) {
   const now = Date.now();
 
@@ -152,24 +164,27 @@ export function NodeCards({
         const flag = regionToFlagEmoji(row.region);
         const memoryTotal = row.status?.ram_total || row.client.mem_total;
         const diskTotal = row.status?.disk_total || row.client.disk_total;
-        const expiration = expirationBadge(
-          row.client.expired_at,
-          row.client.auto_renewal,
-          now,
-        );
-        const renewalPrice = renewalPriceBadge(
-          row.client.price,
-          row.client.currency,
-          row.client.billing_cycle,
-        );
+        const swapTotal = row.status?.swap_total || row.client.swap_total;
+        const ipTags = options.showTags ? row.ipTags : [];
+        const tags = options.showTags ? row.tags : [];
+        const expiration = options.showExpiration
+          ? expirationBadge(row.client.expired_at, row.client.auto_renewal, now)
+          : null;
+        const renewalPrice = options.showPrice
+          ? renewalPriceBadge(
+              row.client.price,
+              row.client.currency,
+              row.client.billing_cycle,
+            )
+          : null;
         const reservedTags =
-          row.ipTags.length + (expiration ? 1 : 0) + (renewalPrice ? 1 : 0);
+          ipTags.length + (expiration ? 1 : 0) + (renewalPrice ? 1 : 0);
         const visibleTagLimit = Math.max(0, 4 - reservedTags);
-        const visibleTags = row.tags.slice(0, visibleTagLimit);
-        const hiddenTagCount = row.tags.length - visibleTags.length;
+        const visibleTags = tags.slice(0, visibleTagLimit);
+        const hiddenTagCount = tags.length - visibleTags.length;
         const allTagLabels = [
-          ...row.ipTags,
-          ...row.tags,
+          ...ipTags,
+          ...tags,
           ...(expiration ? [expiration.label] : []),
           ...(renewalPrice ? [renewalPrice.label] : []),
         ];
@@ -187,7 +202,7 @@ export function NodeCards({
                 !row.online && "opacity-65",
               )}
             >
-              <CardHeader className="h-29 px-4 py-4">
+              <CardHeader className="px-4 py-4">
                 <CardTitle className="flex items-start justify-between gap-3">
                   <span className="flex min-w-0 items-start gap-2.5">
                     <span
@@ -228,14 +243,14 @@ export function NodeCards({
                   </span>
                 </CardTitle>
                 <div
-                  className="mt-1 flex h-10 min-w-0 flex-wrap content-start items-center gap-1.5 overflow-hidden"
+                  className="mt-1 flex h-5 min-w-0 flex-nowrap items-center gap-1.5 overflow-hidden"
                   title={
                     allTagLabels.length > 0
                       ? allTagLabels.join(", ")
                       : undefined
                   }
                 >
-                  {row.ipTags.map((tag) => (
+                  {ipTags.map((tag) => (
                     <Badge
                       key={tag}
                       variant="outline"
@@ -313,9 +328,11 @@ export function NodeCards({
                     label={t("memory")}
                     value={row.memoryUsage}
                     detail={
-                      row.online && memoryTotal > 0
-                        ? `${formatBytes(row.status?.ram ?? 0)} / ${formatBytes(memoryTotal)}`
-                        : "—"
+                      !options.showResourceTotals
+                        ? "\u00a0"
+                        : row.online && memoryTotal > 0
+                          ? `${formatBytes(row.status?.ram ?? 0)} / ${formatBytes(memoryTotal)}`
+                          : "—"
                     }
                   />
                   <UsageMetric
@@ -323,58 +340,78 @@ export function NodeCards({
                     label={t("disk")}
                     value={row.diskUsage}
                     detail={
-                      row.online && diskTotal > 0
-                        ? `${formatBytes(row.status?.disk ?? 0)} / ${formatBytes(diskTotal)}`
-                        : "—"
+                      !options.showResourceTotals
+                        ? "\u00a0"
+                        : row.online && diskTotal > 0
+                          ? `${formatBytes(row.status?.disk ?? 0)} / ${formatBytes(diskTotal)}`
+                          : "—"
                     }
                   />
+                  {options.showSwap ? (
+                    <UsageMetric
+                      icon={ArrowLeftRight}
+                      label={t("swap")}
+                      value={row.swapUsage}
+                      detail={
+                        !options.showResourceTotals
+                          ? "\u00a0"
+                          : row.online && swapTotal > 0
+                            ? `${formatBytes(row.status?.swap ?? 0)} / ${formatBytes(swapTotal)}`
+                            : "—"
+                      }
+                    />
+                  ) : null}
                 </div>
 
-                <Separator className="my-4" />
+                {options.showTraffic ? (
+                  <>
+                    <Separator className="my-4" />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1 text-[10px] font-medium text-status-online">
-                      <ArrowDown className="size-3.5" />
-                      {t("download")}
-                    </p>
-                    <p className="km-metric mt-1 truncate text-base font-semibold text-foreground">
-                      {formatSpeed(row.netIn)}
-                    </p>
-                  </div>
-                  <div className="min-w-0 text-right">
-                    <p className="flex items-center justify-end gap-1 text-[10px] font-medium text-data-accent">
-                      <ArrowUp className="size-3.5" />
-                      {t("upload")}
-                    </p>
-                    <p className="km-metric mt-1 truncate text-base font-semibold text-foreground">
-                      {formatSpeed(row.netOut)}
-                    </p>
-                  </div>
-                </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="min-w-0">
+                        <p className="flex items-center gap-1 text-[10px] font-medium text-status-online">
+                          <ArrowDown className="size-3.5" />
+                          {t("download")}
+                        </p>
+                        <p className="km-metric mt-1 truncate text-base font-semibold text-foreground">
+                          {formatSpeed(row.netIn)}
+                        </p>
+                      </div>
+                      <div className="min-w-0 text-right">
+                        <p className="flex items-center justify-end gap-1 text-[10px] font-medium text-data-accent">
+                          <ArrowUp className="size-3.5" />
+                          {t("upload")}
+                        </p>
+                        <p className="km-metric mt-1 truncate text-base font-semibold text-foreground">
+                          {formatSpeed(row.netOut)}
+                        </p>
+                      </div>
+                    </div>
 
-                <Separator className="my-4" />
+                    <Separator className="my-4" />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1 text-[10px] font-medium text-status-online">
-                      <ArrowDown className="size-3.5" />
-                      {t("totalDownload")}
-                    </p>
-                    <p className="km-metric mt-1 truncate text-sm font-semibold text-foreground">
-                      {formatBytes(row.totalDown)}
-                    </p>
-                  </div>
-                  <div className="min-w-0 text-right">
-                    <p className="flex items-center justify-end gap-1 text-[10px] font-medium text-data-accent">
-                      <ArrowUp className="size-3.5" />
-                      {t("totalUpload")}
-                    </p>
-                    <p className="km-metric mt-1 truncate text-sm font-semibold text-foreground">
-                      {formatBytes(row.totalUp)}
-                    </p>
-                  </div>
-                </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="min-w-0">
+                        <p className="flex items-center gap-1 text-[10px] font-medium text-status-online">
+                          <ArrowDown className="size-3.5" />
+                          {t("totalDownload")}
+                        </p>
+                        <p className="km-metric mt-1 truncate text-sm font-semibold text-foreground">
+                          {formatBytes(row.totalDown)}
+                        </p>
+                      </div>
+                      <div className="min-w-0 text-right">
+                        <p className="flex items-center justify-end gap-1 text-[10px] font-medium text-data-accent">
+                          <ArrowUp className="size-3.5" />
+                          {t("totalUpload")}
+                        </p>
+                        <p className="km-metric mt-1 truncate text-sm font-semibold text-foreground">
+                          {formatBytes(row.totalUp)}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ) : null}
               </CardContent>
             </Card>
           </Link>

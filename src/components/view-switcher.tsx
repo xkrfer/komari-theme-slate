@@ -15,34 +15,38 @@ const views: {
 
 export function ViewSwitcher({
   value,
+  showMap = true,
   onChange,
 }: {
   value: HomeView;
+  showMap?: boolean;
   onChange: (view: HomeView) => void;
 }) {
   return (
     <div className="flex h-9 items-center gap-1 rounded-lg border border-border bg-card p-1 shadow-xs">
-      {views.map((view) => {
-        const Icon = view.icon;
-        return (
-          <Button
-            key={view.id}
-            type="button"
-            size="icon-sm"
-            variant={value === view.id ? "secondary" : "ghost"}
-            className={
-              value === view.id
-                ? "rounded-md bg-data-accent text-white shadow-sm hover:bg-data-accent/85"
-                : "rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-            }
-            aria-label={t(view.label)}
-            title={t(view.label)}
-            onClick={() => onChange(view.id)}
-          >
-            <Icon />
-          </Button>
-        );
-      })}
+      {views
+        .filter((view) => showMap || view.id !== "map")
+        .map((view) => {
+          const Icon = view.icon;
+          return (
+            <Button
+              key={view.id}
+              type="button"
+              size="icon-sm"
+              variant={value === view.id ? "secondary" : "ghost"}
+              className={
+                value === view.id
+                  ? "rounded-md bg-data-accent text-white shadow-sm hover:bg-data-accent/85"
+                  : "rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+              }
+              aria-label={t(view.label)}
+              title={t(view.label)}
+              onClick={() => onChange(view.id)}
+            >
+              <Icon />
+            </Button>
+          );
+        })}
     </div>
   );
 }

@@ -5,13 +5,37 @@ const stringish = z.string().optional().default("");
 
 export const appearanceSchema = z.enum(["system", "light", "dark"]);
 export const homeViewSchema = z.enum(["table", "cards", "map"]);
+export const defaultLanguageSchema = z.enum(["auto", "zh-CN", "en"]);
+export const nodeSortSchema = z.enum([
+  "name",
+  "status",
+  "region",
+  "uptime",
+  "cpu",
+  "memory",
+  "disk",
+  "speed",
+]);
 
 export const themeSettingsSchema = z
   .object({
     defaultAppearance: appearanceSchema.optional().default("system"),
     defaultView: homeViewSchema.optional().default("table"),
+    defaultLanguage: defaultLanguageSchema.optional().default("auto"),
+    defaultSort: nodeSortSchema.optional().default("name"),
+    showStats: z.boolean().optional().default(true),
+    enableMap: z.boolean().optional().default(true),
+    showCardTags: z.boolean().optional().default(true),
+    showCardBilling: z.boolean().optional().default(true),
+    showResourceTotals: z.boolean().optional().default(true),
+    showCardTraffic: z.boolean().optional().default(true),
+    showCardSwap: z.boolean().optional().default(true),
+    guestShowPrice: z.boolean().optional().default(false),
+    guestShowExpiration: z.boolean().optional().default(false),
   })
   .passthrough();
+
+const defaultThemeSettings = themeSettingsSchema.parse({});
 
 export const publicInfoSchema = z
   .object({
@@ -23,12 +47,7 @@ export const publicInfoSchema = z
       .optional()
       .transform((value) => {
         const parsed = themeSettingsSchema.safeParse(value ?? {});
-        return parsed.success
-          ? parsed.data
-          : {
-              defaultAppearance: "system" as const,
-              defaultView: "table" as const,
-            };
+        return parsed.success ? parsed.data : defaultThemeSettings;
       }),
     private_site: z.boolean().optional().default(false),
     disable_password_login: z.boolean().optional().default(false),
@@ -190,6 +209,9 @@ export const loginResultSchema = z
 
 export type Appearance = z.infer<typeof appearanceSchema>;
 export type HomeView = z.infer<typeof homeViewSchema>;
+export type DefaultLanguage = z.infer<typeof defaultLanguageSchema>;
+export type NodeSort = z.infer<typeof nodeSortSchema>;
+export type ThemeSettings = z.infer<typeof themeSettingsSchema>;
 export type PublicInfo = z.infer<typeof publicInfoSchema>;
 export type MeInfo = z.infer<typeof meInfoSchema>;
 export type Client = z.infer<typeof clientSchema>;

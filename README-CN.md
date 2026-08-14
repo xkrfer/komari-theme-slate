@@ -91,14 +91,16 @@ VITE_THEME_VERSION=0.1.0
 
 ## 主题设置
 
-`komari-theme.json` 声明了可在 Komari 后台管理的两项配置：
+`komari-theme.json` 声明了可在 Komari 后台管理的配置：
 
-| 键 | 选项 | 默认 | 说明 |
-| --- | --- | --- | --- |
-| `defaultAppearance` | `system` / `light` / `dark` | `system` | 访客尚未设置本地外观时使用 |
-| `defaultView` | `table` / `cards` / `map` | `table` | 仅约束桌面首次访问；手机仍默认卡片 |
+| 分组 | 配置 |
+| --- | --- |
+| 基础设置 | 默认外观、默认视图、默认语言、节点默认排序 |
+| 首页 | 顶部统计卡片、地图视图 |
+| 节点卡片 | 节点标签、账单信息、资源总量、网络流量、Swap 指标 |
+| 游客显示 | 价格、到期状态 |
 
-访客选择后会写入本地存储（`appearance`、`slate:view`），之后优先使用本地值。
+访客选择外观、语言或视图后会写入本地存储（`appearance`、`language`、`slate:view`），之后优先使用本地值。游客价格和到期状态默认关闭；登录用户不受这两项限制。关闭地图后，已保存的地图视图会自动回退到可用视图。
 
 ## 构建与打包
 
