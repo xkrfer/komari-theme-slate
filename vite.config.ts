@@ -28,16 +28,11 @@ export default defineConfig(({ mode }) => {
         apply: "build",
         enforce: "post",
         transformIndexHtml(html) {
-          return html
-            .replace(
-              /<link rel="stylesheet" crossorigin href="([^"]+)">/g,
-              '<link rel="preload" as="style" crossorigin href="$1" onload="this.onload=null;requestAnimationFrame(()=>requestAnimationFrame(()=>this.rel=\'stylesheet\'))">' +
-                '<noscript><link rel="stylesheet" crossorigin href="$1"></noscript>',
-            )
-            .replace(
-              /<script type="module" crossorigin src="([^"]+)"><\/script>/,
-              '<script type="module">{const start=()=>import("$1");location.pathname==="/"||location.pathname==="/index.html"?requestAnimationFrame(()=>setTimeout(start,64)):start()}</script>',
-            );
+          return html.replace(
+            /<link rel="stylesheet" crossorigin href="([^"]+)">/g,
+            '<link rel="preload" as="style" crossorigin href="$1" onload="this.onload=null;requestAnimationFrame(()=>requestAnimationFrame(()=>this.rel=\'stylesheet\'))">' +
+              '<noscript><link rel="stylesheet" crossorigin href="$1"></noscript>',
+          );
         },
       },
       tanstackRouter({

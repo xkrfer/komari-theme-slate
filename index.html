@@ -48,8 +48,12 @@
         --ps-muted: #f1f0ef;
         --ps-foreground: #1c1917;
         --ps-muted-foreground: #6f6863;
+        position: fixed;
+        z-index: 2147483647;
+        inset: 0;
         display: flex;
         min-height: 100svh;
+        overflow-y: auto;
         flex-direction: column;
         background: var(--ps-bg);
       }
@@ -284,55 +288,54 @@
     </style>
   </head>
   <body>
-    <div id="root">
-      <div id="home-prerender">
-        <div class="ps-header">
-          <div class="ps-header-inner">
-            <div class="ps-brand">
-              <div class="ps-logo"></div>
-              <div class="ps-brand-copy">
-                <div class="ps-brand-title">Komari Monitor</div>
-                <div class="ps-brand-subtitle">Monitoring</div>
-              </div>
+    <div id="home-prerender" aria-hidden="true">
+      <div class="ps-header">
+        <div class="ps-header-inner">
+          <div class="ps-brand">
+            <div class="ps-logo"></div>
+            <div class="ps-brand-copy">
+              <div class="ps-brand-title">Komari Monitor</div>
+              <div class="ps-brand-subtitle">Monitoring</div>
             </div>
-            <div class="ps-actions">
-              <div class="ps-action"></div>
-              <div class="ps-action"></div>
-              <div class="ps-action"></div>
-            </div>
+          </div>
+          <div class="ps-actions">
+            <div class="ps-action"></div>
+            <div class="ps-action"></div>
+            <div class="ps-action"></div>
           </div>
         </div>
-        <main class="ps-main">
-          <div class="ps-intro">
-            <div class="ps-intro-title">👋 概览</div>
-            <div class="ps-intro-description">服务器状态与网络流量一览</div>
-          </div>
-          <div class="ps-stats">
-            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
-            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
-            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
-            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
-          </div>
-          <div class="ps-list">
-            <div class="ps-section-head">
-              <div class="ps-section-copy">
-                <div class="ps-line"></div>
-                <div class="ps-line"></div>
-              </div>
-              <div class="ps-line ps-toolbar"></div>
-            </div>
-            <div class="ps-table">
-              <div class="ps-table-head"></div>
-              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-            </div>
-          </div>
-        </main>
       </div>
+      <main class="ps-main">
+        <div class="ps-intro">
+          <div class="ps-intro-title">👋 概览</div>
+          <div class="ps-intro-description">服务器状态与网络流量一览</div>
+        </div>
+        <div class="ps-stats">
+          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+        </div>
+        <div class="ps-list">
+          <div class="ps-section-head">
+            <div class="ps-section-copy">
+              <div class="ps-line"></div>
+              <div class="ps-line"></div>
+            </div>
+            <div class="ps-line ps-toolbar"></div>
+          </div>
+          <div class="ps-table">
+            <div class="ps-table-head"></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+          </div>
+        </div>
+      </main>
     </div>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

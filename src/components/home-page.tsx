@@ -1,5 +1,12 @@
 import { AlertTriangle, ServerOff } from "lucide-react";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import { HomeLoading } from "@/components/home-loading";
 import { UptimeProvider } from "@/components/live-uptime";
@@ -61,6 +68,10 @@ function NodeMapLoading() {
 }
 
 export function HomePage() {
+  useLayoutEffect(() => {
+    document.documentElement.classList.remove("prerender-home");
+  }, []);
+
   const publicInfo = usePublicInfo();
   const nodes = useNodes();
   const status = useNodeStatus();
