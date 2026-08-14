@@ -1,25 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { Activity, Languages, Monitor, Moon, Search, Sun } from "lucide-react";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
-import { LoginDialog } from "@/components/login-dialog";
 import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { t } from "@/lib/i18n";
 import type { MeInfo } from "@/lib/schemas";
 
 const NodeSearch = lazy(() =>
   import("@/components/node-search").then((module) => ({
     default: module.NodeSearch,
+  })),
+);
+
+const LoginDialog = lazy(() =>
+  import("@/components/login-dialog").then((module) => ({
+    default: module.LoginDialog,
   })),
 );
 
@@ -36,6 +31,26 @@ export function SiteHeader({
   const { locale, setLocale } = useLanguage();
   const loggedIn = Boolean(me?.logged_in);
   const Icon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
+  const [searchLoaded, setSearchLoaded] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [loginLoaded, setLoginLoaded] = useState(false);
+  const iconButtonClass =
+    "inline-flex size-8 items-center justify-center rounded-lg border border-border bg-card shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4";
+  const textButtonClass =
+    "inline-flex h-8 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-medium shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50";
+
+  useEffect(() => {
+    function handleShortcut(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearchLoaded(true);
+        setSearchOpen((current) => !current);
+      }
+    }
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, []);
 
   return (
     <header className="km-navbar bg-background/85 backdrop-blur-xl">
@@ -54,119 +69,111 @@ export function SiteHeader({
           </span>
         </Link>
         <div className="flex items-center gap-1.5">
-          <Suspense
-            fallback={
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                className="rounded-lg bg-card shadow-xs"
-                aria-label={t("search")}
-                disabled
-              >
-                <Search />
-              </Button>
-            }
-          >
-            <NodeSearch />
-          </Suspense>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
+          {searchLoaded ? (
+            <Suspense
+              fallback={
+                <button
                   type="button"
-                  variant="outline"
-                  size="icon"
-                  className="rounded-lg bg-card shadow-xs"
-                  aria-label={t("language")}
-                  title={t("language")}
-                />
+                  className={iconButtonClass}
+                  aria-label={t("search")}
+                  disabled
+                >
+                  <Search />
+                </button>
               }
             >
-              <Languages />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>{t("language")}</DropdownMenuLabel>
-              </DropdownMenuGroup>
-              <DropdownMenuRadioGroup
-                value={locale}
-                onValueChange={(value) => {
-                  if (value === "zh-CN" || value === "en") {
-                    setLocale(value);
-                  }
-                }}
-              >
-                <DropdownMenuRadioItem value="zh-CN">
-                  {t("languageChinese")}
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="en">
-                  {t("languageEnglish")}
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="rounded-lg bg-card shadow-xs"
-                  aria-label={t("appearance")}
-                  title={t("appearance")}
-                />
-              }
-            >
-              <Icon />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>{t("appearance")}</DropdownMenuLabel>
-              </DropdownMenuGroup>
-              <DropdownMenuRadioGroup
-                value={theme}
-                onValueChange={(value) => {
-                  if (
-                    value === "system" ||
-                    value === "light" ||
-                    value === "dark"
-                  ) {
-                    setTheme(value);
-                  }
-                }}
-              >
-                <DropdownMenuRadioItem value="system">
-                  <Monitor />
-                  {t("appearanceSystem")}
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="light">
-                  <Sun />
-                  {t("appearanceLight")}
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="dark">
-                  <Moon />
-                  {t("appearanceDark")}
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {loggedIn ? (
-            <Button
+              <NodeSearch open={searchOpen} onOpenChange={setSearchOpen} />
+            </Suspense>
+          ) : (
+            <button
               type="button"
-              variant="outline"
-              size="default"
-              className="rounded-sm bg-card px-4 shadow-xs"
+              className={iconButtonClass}
+              aria-label={t("search")}
+              title={`${t("search")} (⌘/Ctrl K)`}
+              onClick={() => {
+                setSearchLoaded(true);
+                setSearchOpen(true);
+              }}
+            >
+              <Search />
+            </button>
+          )}
+          <label
+            className={`relative ${iconButtonClass}`}
+            title={t("language")}
+          >
+            <span className="sr-only">{t("language")}</span>
+            <Languages />
+            <select
+              value={locale}
+              aria-label={t("language")}
+              className="absolute inset-0 size-full cursor-pointer opacity-0"
+              onChange={(event) => {
+                const value = event.target.value;
+                if (value === "zh-CN" || value === "en") {
+                  setLocale(value);
+                }
+              }}
+            >
+              <option value="zh-CN">{t("languageChinese")}</option>
+              <option value="en">{t("languageEnglish")}</option>
+            </select>
+          </label>
+
+          <label
+            className={`relative ${iconButtonClass}`}
+            title={t("appearance")}
+          >
+            <span className="sr-only">{t("appearance")}</span>
+            <Icon />
+            <select
+              value={theme}
+              aria-label={t("appearance")}
+              className="absolute inset-0 size-full cursor-pointer opacity-0"
+              onChange={(event) => {
+                const value = event.target.value;
+                if (
+                  value === "system" ||
+                  value === "light" ||
+                  value === "dark"
+                ) {
+                  setTheme(value);
+                }
+              }}
+            >
+              <option value="system">{t("appearanceSystem")}</option>
+              <option value="light">{t("appearanceLight")}</option>
+              <option value="dark">{t("appearanceDark")}</option>
+            </select>
+          </label>
+          {loggedIn ? (
+            <button
+              type="button"
+              className={textButtonClass}
               onClick={() => {
                 window.location.assign("/admin");
               }}
             >
               {t("admin")}
-            </Button>
+            </button>
+          ) : loginLoaded ? (
+            <Suspense
+              fallback={
+                <button type="button" className={textButtonClass} disabled>
+                  {t("login")}
+                </button>
+              }
+            >
+              <LoginDialog onLoggedIn={onLoggedIn} initiallyOpen />
+            </Suspense>
           ) : (
-            <LoginDialog onLoggedIn={onLoggedIn} />
+            <button
+              type="button"
+              className={textButtonClass}
+              onClick={() => setLoginLoaded(true)}
+            >
+              {t("login")}
+            </button>
           )}
         </div>
       </div>

@@ -5,7 +5,7 @@ import {
   useLegacyTable,
 } from "@tanstack/react-table/legacy";
 import { Server } from "lucide-react";
-import { type ReactNode, useMemo } from "react";
+import { type ReactNode, useEffect, useMemo } from "react";
 import { LiveUptime } from "@/components/live-uptime";
 import { Progress } from "@/components/ui/progress";
 import { formatSpeed } from "@/lib/format";
@@ -127,6 +127,16 @@ export function NodeTable({
   sortKey: string;
   showUptime: boolean;
 }) {
+  useEffect(() => {
+    const stylesheet = document.querySelector<HTMLLinkElement>(
+      "#font-logos-stylesheet",
+    );
+    const href = stylesheet?.dataset.href;
+    if (stylesheet && href && !stylesheet.hasAttribute("href")) {
+      stylesheet.href = href;
+    }
+  }, []);
+
   const columns = useMemo(
     () => [
       columnHelper.accessor("name", {
@@ -234,12 +244,20 @@ export function NodeTable({
         id: "speed",
         header: t("colSpeed"),
         cell: (info) => (
-          <span className="inline-flex items-center gap-1 whitespace-nowrap">
-            <span className="text-status-online">↓</span>
-            <span>{formatSpeed(info.row.original.netIn)}</span>
-            <span className="mx-1 text-border">/</span>
-            <span className="text-data-accent">↑</span>
-            <span>{formatSpeed(info.row.original.netOut)}</span>
+          <span className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 whitespace-nowrap">
+            <span className="inline-flex min-w-0 items-center gap-1">
+              <span className="shrink-0 text-status-online">↓</span>
+              <span className="truncate">
+                {formatSpeed(info.row.original.netIn)}
+              </span>
+            </span>
+            <span className="text-border">/</span>
+            <span className="inline-flex min-w-0 items-center gap-1">
+              <span className="shrink-0 text-data-accent">↑</span>
+              <span className="truncate">
+                {formatSpeed(info.row.original.netOut)}
+              </span>
+            </span>
           </span>
         ),
       }),

@@ -195,7 +195,7 @@ export function NodeCards({
             key={`${sortKey}:${row.uuid}`}
             to="/instance/$uuid"
             params={{ uuid: row.uuid }}
-            className="km-sort-item block"
+            className="km-node-card km-sort-item block"
             style={{ animationDelay: `${Math.min(index, 8) * 24}ms` }}
           >
             <Card

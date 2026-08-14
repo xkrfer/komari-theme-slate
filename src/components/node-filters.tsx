@@ -1,11 +1,3 @@
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { t } from "@/lib/i18n";
 
 export function NodeFilters({
@@ -22,31 +14,25 @@ export function NodeFilters({
   }
 
   return (
-    <>
-      <Label className="sr-only" htmlFor="group-filter">
-        {t("filterGroup")}
-      </Label>
-      <Select
+    <label className="relative">
+      <span className="sr-only">{t("filterGroup")}</span>
+      <select
+        id="group-filter"
         value={group ?? "all"}
-        onValueChange={(value) => onGroupChange(value === "all" ? null : value)}
+        onChange={(event) =>
+          onGroupChange(
+            event.target.value === "all" ? null : event.target.value,
+          )
+        }
+        className="h-9 min-w-28 appearance-none rounded-lg border border-input bg-card px-2.5 py-2 text-xs font-medium shadow-xs outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
       >
-        <SelectTrigger
-          id="group-filter"
-          className="h-9 min-w-28 bg-card text-xs font-medium shadow-xs data-[size=default]:h-9"
-        >
-          <SelectValue>
-            {(value) => (value === "all" ? t("allGroups") : value)}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent align="start">
-          <SelectItem value="all">{t("allGroups")}</SelectItem>
-          {groups.map((item) => (
-            <SelectItem key={item} value={item}>
-              {item}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </>
+        <option value="all">{t("allGroups")}</option>
+        {groups.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }

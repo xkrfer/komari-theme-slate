@@ -34,7 +34,14 @@ function StatCard({
   const content = (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+        <p
+          className={cn(
+            "text-xs font-medium",
+            active ? "text-foreground/75" : "text-muted-foreground",
+          )}
+        >
+          {label}
+        </p>
         <div className="km-metric mt-2 h-12 min-w-0 overflow-hidden text-2xl leading-7 font-semibold tracking-tight text-foreground">
           {value}
         </div>

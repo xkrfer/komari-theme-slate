@@ -1,12 +1,9 @@
 import { AlertTriangle, ServerOff } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { HomeLoading } from "@/components/home-loading";
 import { UptimeProvider } from "@/components/live-uptime";
-import { NodeCards } from "@/components/node-cards";
 import { NodeFilters } from "@/components/node-filters";
-import { NodeMap } from "@/components/node-map";
-import { NodeTable } from "@/components/node-table";
 import { SortControl } from "@/components/sort-control";
 import { StatsStrip, type StatusFilter } from "@/components/stats-strip";
 import { ViewSwitcher } from "@/components/view-switcher";
@@ -28,6 +25,40 @@ import {
   writeStoredSortDirection,
 } from "@/lib/sort";
 import { readStoredView, resolveHomeView, writeStoredView } from "@/lib/view";
+
+function loadNodeMap() {
+  return import("@/components/node-map").then((module) => ({
+    default: module.NodeMap,
+  }));
+}
+
+const NodeCards = lazy(() =>
+  import("@/components/node-cards").then((module) => ({
+    default: module.NodeCards,
+  })),
+);
+const NodeTable = lazy(() =>
+  import("@/components/node-table").then((module) => ({
+    default: module.NodeTable,
+  })),
+);
+const NodeMap = lazy(loadNodeMap);
+
+function NodeMapLoading() {
+  return (
+    <div
+      className="overflow-hidden rounded-lg border border-border bg-card shadow-xs"
+      aria-hidden="true"
+    >
+      <div className="border-b border-border/70 px-4 py-3.5">
+        <div className="km-skeleton h-5 w-28 rounded-md" />
+      </div>
+      <div className="bg-muted/15 px-2 py-3 sm:px-5 sm:py-4">
+        <div className="km-skeleton h-80 w-full rounded-md sm:h-105 lg:h-120" />
+      </div>
+    </div>
+  );
+}
 
 export function HomePage() {
   const publicInfo = usePublicInfo();
@@ -197,6 +228,9 @@ export function HomePage() {
                     <ViewSwitcher
                       value={activeView}
                       showMap={enableMap}
+                      onMapIntent={() => {
+                        void loadNodeMap();
+                      }}
                       onChange={(next) => {
                         writeStoredView(next);
                         setView(next);
@@ -227,34 +261,47 @@ export function HomePage() {
                       {t("noNodesDescription")}
                     </p>
                   </div>
-                ) : activeView === "table" ? (
-                  <NodeTable
-                    rows={visible}
-                    sortKey={`${sort}:${sortDirection}`}
-                    showUptime={showUptime}
-                  />
-                ) : activeView === "cards" ? (
-                  <NodeCards
-                    rows={visible}
-                    sortKey={`${sort}:${sortDirection}`}
-                    options={{
-                      showTags: settings?.showCardTags ?? true,
-                      showPrice:
-                        (settings?.showCardBilling ?? true) &&
-                        (Boolean(me.data?.logged_in) ||
-                          Boolean(settings?.guestShowPrice)),
-                      showExpiration:
-                        (settings?.showCardBilling ?? true) &&
-                        (Boolean(me.data?.logged_in) ||
-                          Boolean(settings?.guestShowExpiration)),
-                      showResourceTotals: settings?.showResourceTotals ?? true,
-                      showTraffic: settings?.showCardTraffic ?? true,
-                      showSwap: settings?.showCardSwap ?? true,
-                      showUptime,
-                    }}
-                  />
                 ) : (
-                  <NodeMap rows={visible} />
+                  <Suspense
+                    fallback={
+                      activeView === "map" ? (
+                        <NodeMapLoading />
+                      ) : (
+                        <HomeLoading />
+                      )
+                    }
+                  >
+                    {activeView === "table" ? (
+                      <NodeTable
+                        rows={visible}
+                        sortKey={`${sort}:${sortDirection}`}
+                        showUptime={showUptime}
+                      />
+                    ) : activeView === "cards" ? (
+                      <NodeCards
+                        rows={visible}
+                        sortKey={`${sort}:${sortDirection}`}
+                        options={{
+                          showTags: settings?.showCardTags ?? true,
+                          showPrice:
+                            (settings?.showCardBilling ?? true) &&
+                            (Boolean(me.data?.logged_in) ||
+                              Boolean(settings?.guestShowPrice)),
+                          showExpiration:
+                            (settings?.showCardBilling ?? true) &&
+                            (Boolean(me.data?.logged_in) ||
+                              Boolean(settings?.guestShowExpiration)),
+                          showResourceTotals:
+                            settings?.showResourceTotals ?? true,
+                          showTraffic: settings?.showCardTraffic ?? true,
+                          showSwap: settings?.showCardSwap ?? true,
+                          showUptime,
+                        }}
+                      />
+                    ) : (
+                      <NodeMap rows={visible} />
+                    )}
+                  </Suspense>
                 )}
               </section>
             </>

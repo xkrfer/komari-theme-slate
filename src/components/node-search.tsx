@@ -1,7 +1,7 @@
 import { Autocomplete } from "@base-ui/react/autocomplete";
 import { useNavigate } from "@tanstack/react-router";
 import { CornerDownLeft, MapPin, Search } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,8 +23,13 @@ function searchableText(client: Client) {
   return client.name.toLocaleLowerCase();
 }
 
-export function NodeSearch() {
-  const [open, setOpen] = useState(false);
+export function NodeSearch({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const [query, setQuery] = useState("");
   const nodes = useNodes();
   const status = useNodeStatus();
@@ -40,20 +45,8 @@ export function NodeSearch() {
     return matching.slice(0, SEARCH_RESULT_LIMIT);
   }, [nodes.data, normalizedQuery]);
 
-  useEffect(() => {
-    function handleShortcut(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setOpen((current) => !current);
-      }
-    }
-
-    window.addEventListener("keydown", handleShortcut);
-    return () => window.removeEventListener("keydown", handleShortcut);
-  }, []);
-
   function handleOpenChange(nextOpen: boolean) {
-    setOpen(nextOpen);
+    onOpenChange(nextOpen);
     if (!nextOpen) setQuery("");
   }
 

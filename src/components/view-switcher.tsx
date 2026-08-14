@@ -1,5 +1,4 @@
 import { LayoutGrid, MapIcon, Table2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { t } from "@/lib/i18n";
 import type { HomeView } from "@/lib/schemas";
 
@@ -16,10 +15,12 @@ const views: {
 export function ViewSwitcher({
   value,
   showMap = true,
+  onMapIntent,
   onChange,
 }: {
   value: HomeView;
   showMap?: boolean;
+  onMapIntent?: () => void;
   onChange: (view: HomeView) => void;
 }) {
   return (
@@ -29,22 +30,22 @@ export function ViewSwitcher({
         .map((view) => {
           const Icon = view.icon;
           return (
-            <Button
+            <button
               key={view.id}
               type="button"
-              size="icon-sm"
-              variant={value === view.id ? "secondary" : "ghost"}
-              className={
+              className={`inline-flex size-7 items-center justify-center outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 [&_svg]:size-4 ${
                 value === view.id
                   ? "rounded-md bg-data-accent text-white shadow-sm hover:bg-data-accent/85"
                   : "rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-              }
+              }`}
               aria-label={t(view.label)}
               title={t(view.label)}
+              onPointerEnter={view.id === "map" ? onMapIntent : undefined}
+              onFocus={view.id === "map" ? onMapIntent : undefined}
               onClick={() => onChange(view.id)}
             >
               <Icon />
-            </Button>
+            </button>
           );
         })}
     </div>

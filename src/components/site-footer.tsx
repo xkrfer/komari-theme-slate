@@ -11,7 +11,7 @@ export function SiteFooter({ sitename }: { sitename: string }) {
 
   return (
     <footer className="km-footer mt-8">
-      <div className="mx-auto grid w-full max-w-6xl gap-2 px-4 py-5 text-center text-[11px] font-light tracking-tight text-muted-foreground/70 sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:text-left">
+      <div className="mx-auto grid w-full max-w-6xl gap-2 px-4 py-5 text-center text-[11px] font-light tracking-tight text-muted-foreground sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:text-left">
         <p>
           © {new Date().getFullYear()} {displayName}
         </p>

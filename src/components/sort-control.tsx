@@ -1,13 +1,4 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { t } from "@/lib/i18n";
 import type { NodeSort, SortDirection } from "@/lib/schemas";
 
@@ -37,45 +28,47 @@ export function SortControl({
 
   return (
     <div className="flex items-center gap-1.5">
-      <Label className="sr-only" htmlFor="node-sort">
-        {t("sort")}
-      </Label>
-      <Select
-        value={value}
-        onValueChange={(nextValue) => onChange(nextValue as NodeSort)}
-      >
-        <SelectTrigger
+      <label className="relative">
+        <span className="sr-only">{t("sort")}</span>
+        <select
           id="node-sort"
-          className="h-9 min-w-28 bg-card text-xs font-medium shadow-xs data-[size=default]:h-9"
+          value={value}
+          onChange={(event) => onChange(event.target.value as NodeSort)}
+          className="h-9 min-w-28 appearance-none rounded-lg border border-input bg-card px-2.5 py-2 text-xs font-medium shadow-xs outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          <SelectValue>
-            {(selectedValue) => getSortLabel(selectedValue as NodeSort)}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent align="start">
-          <SelectItem value="name">{t("sortName")}</SelectItem>
-          <SelectItem value="status">{t("sortStatus")}</SelectItem>
-          <SelectItem value="region">{t("colRegion")}</SelectItem>
-          <SelectItem value="uptime">{t("colUptime")}</SelectItem>
-          <SelectItem value="cpu">{t("cpu")}</SelectItem>
-          <SelectItem value="memory">{t("memory")}</SelectItem>
-          <SelectItem value="disk">{t("disk")}</SelectItem>
-          <SelectItem value="speed">{t("sortSpeed")}</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button
+          {(
+            [
+              "name",
+              "status",
+              "region",
+              "uptime",
+              "cpu",
+              "memory",
+              "disk",
+              "speed",
+            ] as NodeSort[]
+          ).map((sortValue) => (
+            <option key={sortValue} value={sortValue}>
+              {getSortLabel(sortValue)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button
         type="button"
-        size="icon-sm"
-        variant="outline"
-        className="size-9 rounded-lg bg-card shadow-xs"
+        className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-card text-sm shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         aria-label={
           direction === "asc" ? t("sortAscending") : t("sortDescending")
         }
         title={direction === "asc" ? t("sortAscending") : t("sortDescending")}
         onClick={() => onDirectionChange(direction === "asc" ? "desc" : "asc")}
       >
-        <DirectionIcon key={direction} className="km-sort-icon" />
-      </Button>
+        <DirectionIcon
+          key={direction}
+          className="km-sort-icon size-4"
+          strokeWidth={1.5}
+        />
+      </button>
     </div>
   );
 }

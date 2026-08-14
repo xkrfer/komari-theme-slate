@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" vite-ignore />
     <link
+      id="font-logos-stylesheet"
       rel="stylesheet"
-      href="https://fastly.jsdelivr.net/npm/font-logos@1/assets/font-logos.css"
+      data-href="/assets/font-logos/font-logos.css"
     />
+    <noscript>
+      <link rel="stylesheet" href="/assets/font-logos/font-logos.css" />
+    </noscript>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="robots"
@@ -14,9 +18,321 @@
     />
     <title>Komari Monitor</title>
     <meta name="description" content="A simple server monitor tool." />
+    <script>
+      (() => {
+        const root = document.documentElement;
+        if (location.pathname === "/" || location.pathname === "/index.html") {
+          root.classList.add("prerender-home");
+        }
+        let appearance = "system";
+        try {
+          appearance = localStorage.getItem("appearance") || "system";
+        } catch {
+          // Use the system appearance when storage is unavailable.
+        }
+        const dark =
+          appearance === "dark" ||
+          (appearance !== "light" &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        root.classList.add(dark ? "dark" : "light");
+      })();
+    </script>
+    <style>
+      #home-prerender {
+        display: none;
+      }
+      html.prerender-home #home-prerender {
+        --ps-bg: #fafafa;
+        --ps-card: #fff;
+        --ps-border: #e7e5e4;
+        --ps-muted: #f1f0ef;
+        --ps-foreground: #1c1917;
+        --ps-muted-foreground: #6f6863;
+        display: flex;
+        min-height: 100svh;
+        flex-direction: column;
+        background: var(--ps-bg);
+      }
+      html.dark #home-prerender {
+        --ps-bg: #171412;
+        --ps-card: #0c0a09;
+        --ps-border: #292524;
+        --ps-muted: #292524;
+        --ps-foreground: #fafaf9;
+        --ps-muted-foreground: #a8a29e;
+      }
+      body {
+        margin: 0;
+      }
+      .ps-header {
+        height: 63px;
+        border-bottom: 1px solid var(--ps-border);
+      }
+      .ps-header-inner,
+      .ps-main {
+        width: min(100% - 32px, 1152px);
+        margin-inline: auto;
+      }
+      .ps-header-inner {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .ps-brand,
+      .ps-actions,
+      .ps-row,
+      .ps-section-head {
+        display: flex;
+        align-items: center;
+      }
+      .ps-brand,
+      .ps-actions {
+        gap: 10px;
+      }
+      .ps-logo,
+      .ps-action,
+      .ps-line,
+      .ps-card,
+      .ps-table-head,
+      .ps-cell {
+        background: var(--ps-muted);
+      }
+      .ps-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+      }
+      .ps-brand-copy {
+        display: grid;
+        gap: 1px;
+        color: var(--ps-foreground);
+        font-family:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+      .ps-brand-title {
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600;
+      }
+      .ps-brand-subtitle {
+        color: var(--ps-muted-foreground);
+        font-size: 12px;
+        line-height: 16px;
+      }
+      .ps-line {
+        height: 10px;
+        border-radius: 999px;
+      }
+      .ps-line-title {
+        width: 112px;
+      }
+      .ps-line-subtitle {
+        width: 72px;
+        height: 8px;
+      }
+      .ps-action {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--ps-border);
+        border-radius: 8px;
+      }
+      .ps-main {
+        box-sizing: border-box;
+        padding-block: 56px;
+      }
+      .ps-intro {
+        display: grid;
+        gap: 4px;
+        margin-bottom: 24px;
+        color: var(--ps-foreground);
+        font-family:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+      .ps-intro-title {
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600;
+      }
+      .ps-intro-description {
+        color: var(--ps-muted-foreground);
+        font-size: 16px;
+        line-height: 24px;
+      }
+      .ps-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .ps-card {
+        box-sizing: border-box;
+        height: 112px;
+        padding: 16px;
+        border: 1px solid var(--ps-border);
+        border-radius: 8px;
+        background: var(--ps-card);
+      }
+      .ps-card .ps-line:first-child {
+        width: 80px;
+      }
+      .ps-card .ps-line:last-child {
+        width: 56px;
+        height: 28px;
+        margin-top: 14px;
+      }
+      .ps-list {
+        margin-top: 40px;
+      }
+      .ps-section-head {
+        min-height: 36px;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .ps-section-copy {
+        display: grid;
+        gap: 8px;
+      }
+      .ps-section-copy .ps-line:first-child {
+        width: 64px;
+        height: 14px;
+      }
+      .ps-section-copy .ps-line:last-child {
+        width: 176px;
+        height: 9px;
+      }
+      .ps-toolbar {
+        width: 176px;
+        height: 36px;
+        border-radius: 8px;
+      }
+      .ps-table {
+        overflow: hidden;
+        border: 1px solid var(--ps-border);
+        border-radius: 8px;
+        background: var(--ps-card);
+      }
+      .ps-table-head {
+        height: 40px;
+      }
+      .ps-row {
+        box-sizing: border-box;
+        height: 60px;
+        gap: 32px;
+        padding-inline: 16px;
+        border-top: 1px solid var(--ps-border);
+      }
+      .ps-cell {
+        width: 12%;
+        height: 10px;
+        border-radius: 999px;
+      }
+      .ps-cell:first-child {
+        width: 22%;
+      }
+      .ps-cell:last-child {
+        width: 18%;
+      }
+      .ps-logo,
+      .ps-action,
+      .ps-line,
+      .ps-table-head,
+      .ps-cell {
+        animation: ps-pulse 1.8s ease-in-out infinite;
+      }
+      @keyframes ps-pulse {
+        50% {
+          opacity: 0.45;
+        }
+      }
+      @media (max-width: 767px) {
+        .ps-main {
+          padding-block: 40px;
+        }
+        .ps-stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .ps-section-head {
+          align-items: flex-end;
+          gap: 16px;
+        }
+        .ps-toolbar {
+          width: 108px;
+        }
+        .ps-row {
+          gap: 18px;
+        }
+        .ps-cell:nth-child(n + 5) {
+          display: none;
+        }
+        .ps-cell,
+        .ps-cell:first-child,
+        .ps-cell:last-child {
+          width: 25%;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ps-logo,
+        .ps-action,
+        .ps-line,
+        .ps-table-head,
+        .ps-cell {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="home-prerender">
+        <div class="ps-header">
+          <div class="ps-header-inner">
+            <div class="ps-brand">
+              <div class="ps-logo"></div>
+              <div class="ps-brand-copy">
+                <div class="ps-brand-title">Komari Monitor</div>
+                <div class="ps-brand-subtitle">Monitoring</div>
+              </div>
+            </div>
+            <div class="ps-actions">
+              <div class="ps-action"></div>
+              <div class="ps-action"></div>
+              <div class="ps-action"></div>
+            </div>
+          </div>
+        </div>
+        <main class="ps-main">
+          <div class="ps-intro">
+            <div class="ps-intro-title">👋 概览</div>
+            <div class="ps-intro-description">服务器状态与网络流量一览</div>
+          </div>
+          <div class="ps-stats">
+            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+          </div>
+          <div class="ps-list">
+            <div class="ps-section-head">
+              <div class="ps-section-copy">
+                <div class="ps-line"></div>
+                <div class="ps-line"></div>
+              </div>
+              <div class="ps-line ps-toolbar"></div>
+            </div>
+            <div class="ps-table">
+              <div class="ps-table-head"></div>
+              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+              <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

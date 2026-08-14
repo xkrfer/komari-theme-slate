@@ -27,8 +27,14 @@ import { t } from "@/lib/i18n";
 const OTP_LENGTH = 6;
 const OTP_SLOTS = Array.from({ length: OTP_LENGTH }, (_, index) => index);
 
-export function LoginDialog({ onLoggedIn }: { onLoggedIn: () => void }) {
-  const [open, setOpen] = useState(false);
+export function LoginDialog({
+  onLoggedIn,
+  initiallyOpen = false,
+}: {
+  onLoggedIn: () => void;
+  initiallyOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(initiallyOpen);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [totp, setTotp] = useState("");
