@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { LineChart } from "echarts/charts";
-import { GridComponent, TooltipComponent } from "echarts/components";
+import {
+  GridComponent,
+  LegendComponent,
+  TooltipComponent,
+} from "echarts/components";
 import * as echarts from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { ArrowLeft, CircleAlert, MapPin } from "lucide-react";
@@ -26,7 +30,13 @@ import type {
 } from "@/lib/schemas";
 import { cn } from "@/lib/utils";
 
-echarts.use([LineChart, GridComponent, TooltipComponent, CanvasRenderer]);
+echarts.use([
+  LineChart,
+  GridComponent,
+  LegendComponent,
+  TooltipComponent,
+  CanvasRenderer,
+]);
 
 type TimeRange = "live" | "24" | "168" | "720";
 type ChartRecord = LoadRecord | NodeStatus;
@@ -207,6 +217,9 @@ function MonitoringChart({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.EChartsType | null>(null);
+  const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   useEffect(() => {
     const host = ref.current;
@@ -278,26 +291,28 @@ function MonitoringChart({
 
     chart.setOption(
       {
-        series: series.map((item) => ({
-          id: item.name,
-          name: item.name,
-          type: "line",
-          data: item.values,
-          showSymbol: false,
-          symbol: "none",
-          smooth: 0.18,
-          lineStyle: { color: item.color, width: 1.5 },
-          itemStyle: { color: item.color },
-          areaStyle: { color: item.color, opacity: 0.18 },
-          emphasis: { disabled: true },
-        })),
+        series: series
+          .filter((item) => !hiddenSeries.has(item.name))
+          .map((item) => ({
+            id: item.name,
+            name: item.name,
+            type: "line",
+            data: item.values,
+            showSymbol: false,
+            symbol: "none",
+            smooth: 0.18,
+            lineStyle: { color: item.color, width: 1.5 },
+            itemStyle: { color: item.color },
+            areaStyle: { color: item.color, opacity: 0.18 },
+            emphasis: { disabled: true },
+          })),
       },
       {
         lazyUpdate: true,
         replaceMerge: ["series"],
       },
     );
-  }, [series]);
+  }, [hiddenSeries, series]);
 
   const empty = !loading && series.every((item) => item.values.length === 0);
 
@@ -309,16 +324,29 @@ function MonitoringChart({
           <div className="mt-1 flex min-h-5 flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             {series.length > 1
               ? series.map((item) => (
-                  <span
+                  <button
                     key={item.name}
-                    className="inline-flex items-center gap-1.5"
+                    type="button"
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-sm transition-opacity hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                      hiddenSeries.has(item.name) && "opacity-45",
+                    )}
+                    aria-pressed={!hiddenSeries.has(item.name)}
+                    onClick={() => {
+                      setHiddenSeries((current) => {
+                        const next = new Set(current);
+                        if (next.has(item.name)) next.delete(item.name);
+                        else next.add(item.name);
+                        return next;
+                      });
+                    }}
                   >
                     <span
                       className="size-1.5 rounded-full"
                       style={{ background: item.color }}
                     />
                     {item.name}
-                  </span>
+                  </button>
                 ))
               : null}
           </div>
@@ -569,6 +597,7 @@ function PingChart({
         legend: {
           bottom: 0,
           left: "center",
+          selectedMode: true,
           icon: "roundRect",
           itemWidth: 9,
           itemHeight: 9,

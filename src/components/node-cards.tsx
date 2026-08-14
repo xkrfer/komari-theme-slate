@@ -195,12 +195,13 @@ export function NodeCards({
             key={`${sortKey}:${row.uuid}`}
             to="/instance/$uuid"
             params={{ uuid: row.uuid }}
-            className="km-node-card km-sort-item block"
+            className="km-node-card km-sort-item block transition-[translate] duration-200 hover:-translate-y-0.5"
             style={{ animationDelay: `${Math.min(index, 8) * 24}ms` }}
           >
             <Card
+              style={{ boxShadow: "none" }}
               className={cn(
-                "h-full gap-0 bg-card py-0 ring-border transition-colors hover:bg-muted/15 hover:ring-foreground/25",
+                "h-full gap-0 rounded-lg border border-border bg-card py-0 shadow-none ring-0 transition-colors duration-200 hover:border-foreground/30 hover:bg-card",
                 !row.online && "opacity-65",
               )}
             >
