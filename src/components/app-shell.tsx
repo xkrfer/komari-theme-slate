@@ -6,7 +6,12 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { useTheme } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { queryKeys, useMe, usePublicInfo } from "@/hooks/use-komari";
+import {
+  queryKeys,
+  useLiveStatus,
+  useMe,
+  usePublicInfo,
+} from "@/hooks/use-komari";
 import { LANGUAGE_KEY, resolveDefaultLocale } from "@/lib/i18n";
 
 export function AppShell() {
@@ -15,6 +20,8 @@ export function AppShell() {
   const queryClient = useQueryClient();
   const { locale, setDefaultLocale } = useLanguage();
   const { theme, setDefaultTheme } = useTheme();
+  const loggedIn = Boolean(me.data?.logged_in);
+  useLiveStatus(loggedIn);
 
   useEffect(() => {
     const managed =

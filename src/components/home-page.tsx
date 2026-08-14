@@ -11,7 +11,6 @@ import { SortControl } from "@/components/sort-control";
 import { StatsStrip, type StatusFilter } from "@/components/stats-strip";
 import { ViewSwitcher } from "@/components/view-switcher";
 import {
-  useLiveStatus,
   useMe,
   useNodeStatus,
   useNodes,
@@ -36,7 +35,6 @@ export function HomePage() {
   const status = useNodeStatus();
   const me = useMe();
   const health = useRpcHealth();
-  useLiveStatus();
 
   const settings = publicInfo.data?.theme_settings;
   const managedView = settings?.defaultView ?? "table";

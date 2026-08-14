@@ -80,7 +80,7 @@ export function useServerVersion() {
   });
 }
 
-export function useLiveStatus() {
+export function useLiveStatus(authenticated: boolean) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -99,6 +99,10 @@ export function useLiveStatus() {
       );
       queryClient.setQueryData(queryKeys.status, parsed);
     };
+
+    if (authenticated) {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.status });
+    }
 
     const poll = () => {
       if (timer !== null) {
@@ -183,5 +187,5 @@ export function useLiveStatus() {
       stopTimer();
       ws?.close();
     };
-  }, [queryClient]);
+  }, [authenticated, queryClient]);
 }

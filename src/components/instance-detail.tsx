@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLiveStatus, useNodeStatus, usePingTasks } from "@/hooks/use-komari";
+import { useNodeStatus, usePingTasks } from "@/hooks/use-komari";
 import { getLoadRecords, getPingRecords, getRecentNodeStatus } from "@/lib/api";
 import { formatBytes, formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -709,7 +709,6 @@ function NetworkPanel({ client, range }: { client: Client; range: TimeRange }) {
 export function InstanceDetail({ client }: { client: Client }) {
   const [range, setRange] = useState<TimeRange>("live");
   const statusQuery = useNodeStatus();
-  useLiveStatus();
   const status = statusQuery.data?.[client.uuid];
   const historyQuery = useQuery({
     queryKey: ["load", client.uuid, range],
