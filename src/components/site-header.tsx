@@ -1,5 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Activity, Languages, Monitor, Moon, Search, Sun } from "lucide-react";
+import {
+  Activity,
+  CircleUserRound,
+  Languages,
+  LogIn,
+  Monitor,
+  Moon,
+  Search,
+  Sun,
+} from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useLanguage } from "@/components/language-provider";
 import { useTheme } from "@/components/theme-provider";
@@ -36,8 +45,6 @@ export function SiteHeader({
   const [loginLoaded, setLoginLoaded] = useState(false);
   const iconButtonClass =
     "inline-flex size-8 items-center justify-center rounded-lg border border-border bg-card shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4";
-  const textButtonClass =
-    "inline-flex h-8 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-medium shadow-xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50";
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
@@ -149,18 +156,25 @@ export function SiteHeader({
           {loggedIn ? (
             <button
               type="button"
-              className={textButtonClass}
+              className={iconButtonClass}
+              aria-label={t("admin")}
+              title={t("admin")}
               onClick={() => {
                 window.location.assign("/admin");
               }}
             >
-              {t("admin")}
+              <CircleUserRound />
             </button>
           ) : loginLoaded ? (
             <Suspense
               fallback={
-                <button type="button" className={textButtonClass} disabled>
-                  {t("login")}
+                <button
+                  type="button"
+                  className={iconButtonClass}
+                  aria-label={t("login")}
+                  disabled
+                >
+                  <LogIn />
                 </button>
               }
             >
@@ -169,10 +183,12 @@ export function SiteHeader({
           ) : (
             <button
               type="button"
-              className={textButtonClass}
+              className={iconButtonClass}
+              aria-label={t("login")}
+              title={t("login")}
               onClick={() => setLoginLoaded(true)}
             >
-              {t("login")}
+              <LogIn />
             </button>
           )}
         </div>

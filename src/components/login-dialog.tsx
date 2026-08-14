@@ -5,6 +5,7 @@ import {
   KeyRound,
   LoaderCircle,
   LockKeyhole,
+  LogIn,
   UserRound,
 } from "lucide-react";
 import { type FormEvent, useId, useState } from "react";
@@ -95,12 +96,14 @@ export function LoginDialog({
         render={
           <Button
             variant="outline"
-            size="default"
-            className="rounded-lg bg-card px-4 shadow-xs"
+            size="icon"
+            className="rounded-lg bg-card shadow-xs"
+            aria-label={t("login")}
+            title={t("login")}
           />
         }
       >
-        {t("login")}
+        <LogIn />
       </DialogTrigger>
       <DialogContent className="gap-0 overflow-hidden rounded-lg p-0 sm:max-w-sm">
         <form onSubmit={(event) => void handleSubmit(event)} className="grid">

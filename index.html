@@ -45,7 +45,7 @@
         --ps-bg: #fafafa;
         --ps-card: #fff;
         --ps-border: #e7e5e4;
-        --ps-muted: #f1f0ef;
+        --ps-muted: #f5f4f3;
         --ps-foreground: #1c1917;
         --ps-muted-foreground: #6f6863;
         position: fixed;
@@ -61,7 +61,7 @@
         --ps-bg: #171412;
         --ps-card: #0c0a09;
         --ps-border: #292524;
-        --ps-muted: #292524;
+        --ps-muted: #24201e;
         --ps-foreground: #fafaf9;
         --ps-muted-foreground: #a8a29e;
       }
@@ -69,8 +69,8 @@
         margin: 0;
       }
       .ps-header {
-        height: 63px;
-        border-bottom: 1px solid var(--ps-border);
+        flex: 0 0 64px;
+        height: 64px;
       }
       .ps-header-inner,
       .ps-main {
@@ -85,40 +85,43 @@
       }
       .ps-brand,
       .ps-actions,
-      .ps-row,
+      .ps-card-row,
       .ps-section-head {
         display: flex;
         align-items: center;
       }
-      .ps-brand,
-      .ps-actions {
+      .ps-brand {
+        min-width: 0;
         gap: 10px;
       }
-      .ps-logo,
-      .ps-action,
+      .ps-actions {
+        gap: 6px;
+      }
       .ps-line,
-      .ps-card,
       .ps-table-head,
       .ps-cell {
         background: var(--ps-muted);
       }
       .ps-logo {
+        display: flex;
+        flex: 0 0 auto;
         width: 32px;
         height: 32px;
+        align-items: center;
+        justify-content: center;
         border-radius: 4px;
+        background: var(--ps-foreground);
+        color: var(--ps-card);
+        box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
       }
       .ps-brand-copy {
         display: grid;
+        min-width: 0;
         gap: 1px;
         color: var(--ps-foreground);
         font-family:
           ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           sans-serif;
-      }
-      .ps-brand-title {
-        font-size: 14px;
-        line-height: 20px;
-        font-weight: 600;
       }
       .ps-brand-subtitle {
         color: var(--ps-muted-foreground);
@@ -131,16 +134,30 @@
       }
       .ps-line-title {
         width: 112px;
+        height: 12px;
       }
-      .ps-line-subtitle {
-        width: 72px;
-        height: 8px;
+      .ps-logo svg,
+      .ps-action svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentcolor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
       }
       .ps-action {
-        width: 36px;
-        height: 36px;
+        box-sizing: border-box;
+        display: flex;
+        width: 32px;
+        height: 32px;
+        align-items: center;
+        justify-content: center;
         border: 1px solid var(--ps-border);
         border-radius: 8px;
+        background: var(--ps-card);
+        color: var(--ps-foreground);
+        box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
       }
       .ps-main {
         box-sizing: border-box;
@@ -162,8 +179,8 @@
       }
       .ps-intro-description {
         color: var(--ps-muted-foreground);
-        font-size: 16px;
-        line-height: 24px;
+        font-size: 14px;
+        line-height: 20px;
       }
       .ps-stats {
         display: grid;
@@ -178,13 +195,24 @@
         border-radius: 8px;
         background: var(--ps-card);
       }
-      .ps-card .ps-line:first-child {
-        width: 80px;
+      .ps-card-row {
+        align-items: flex-start;
+        justify-content: space-between;
       }
-      .ps-card .ps-line:last-child {
+      .ps-stat-label {
+        width: 80px;
+        height: 12px;
+      }
+      .ps-stat-value {
         width: 56px;
         height: 28px;
-        margin-top: 14px;
+        margin-top: 12px;
+        border-radius: 6px;
+      }
+      .ps-stat-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
       }
       .ps-list {
         margin-top: 40px;
@@ -200,11 +228,11 @@
       }
       .ps-section-copy .ps-line:first-child {
         width: 64px;
-        height: 14px;
+        height: 16px;
       }
       .ps-section-copy .ps-line:last-child {
         width: 176px;
-        height: 9px;
+        height: 12px;
       }
       .ps-toolbar {
         width: 176px;
@@ -222,32 +250,48 @@
       }
       .ps-row {
         box-sizing: border-box;
+        display: grid;
         height: 60px;
-        gap: 32px;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        align-items: center;
+        gap: 16px;
         padding-inline: 16px;
         border-top: 1px solid var(--ps-border);
       }
       .ps-cell {
-        width: 12%;
+        width: 64px;
+        max-width: 100%;
         height: 10px;
         border-radius: 999px;
       }
       .ps-cell:first-child {
-        width: 22%;
+        width: 96px;
       }
       .ps-cell:last-child {
-        width: 18%;
+        width: 96px;
       }
-      .ps-logo,
-      .ps-action,
+      .ps-cell:nth-child(2) {
+        width: 48px;
+      }
+      .ps-cell:nth-child(3) {
+        width: 40px;
+      }
+      .ps-cell:nth-child(n + 4):nth-child(-n + 6) {
+        height: 24px;
+        border-radius: 6px;
+      }
       .ps-line,
       .ps-table-head,
       .ps-cell {
-        animation: ps-pulse 1.8s ease-in-out infinite;
+        animation: ps-pulse 2.4s ease-in-out infinite;
       }
       @keyframes ps-pulse {
+        0%,
+        100% {
+          opacity: 0.55;
+        }
         50% {
-          opacity: 0.45;
+          opacity: 0.9;
         }
       }
       @media (max-width: 767px) {
@@ -265,20 +309,13 @@
           width: 108px;
         }
         .ps-row {
-          gap: 18px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
         }
         .ps-cell:nth-child(n + 5) {
           display: none;
         }
-        .ps-cell,
-        .ps-cell:first-child,
-        .ps-cell:last-child {
-          width: 25%;
-        }
       }
       @media (prefers-reduced-motion: reduce) {
-        .ps-logo,
-        .ps-action,
         .ps-line,
         .ps-table-head,
         .ps-cell {
@@ -292,16 +329,47 @@
       <div class="ps-header">
         <div class="ps-header-inner">
           <div class="ps-brand">
-            <div class="ps-logo"></div>
+            <div class="ps-logo">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path>
+              </svg>
+            </div>
             <div class="ps-brand-copy">
-              <div class="ps-brand-title">Komari Monitor</div>
+              <div class="ps-line ps-line-title"></div>
               <div class="ps-brand-subtitle">Monitoring</div>
             </div>
           </div>
           <div class="ps-actions">
-            <div class="ps-action"></div>
-            <div class="ps-action"></div>
-            <div class="ps-action"></div>
+            <div class="ps-action">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m21 21-4.34-4.34"></path>
+                <circle cx="11" cy="11" r="8"></circle>
+              </svg>
+            </div>
+            <div class="ps-action">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m5 8 6 6"></path>
+                <path d="m4 14 6-6 2-3"></path>
+                <path d="M2 5h12"></path>
+                <path d="M7 2h1"></path>
+                <path d="m22 22-5-10-5 10"></path>
+                <path d="M14 18h6"></path>
+              </svg>
+            </div>
+            <div class="ps-action">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+                <line x1="8" x2="16" y1="21" y2="21"></line>
+                <line x1="12" x2="12" y1="17" y2="21"></line>
+              </svg>
+            </div>
+            <div class="ps-action">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m10 17 5-5-5-5"></path>
+                <path d="M15 12H3"></path>
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -311,10 +379,30 @@
           <div class="ps-intro-description">服务器状态与网络流量一览</div>
         </div>
         <div class="ps-stats">
-          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
-          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
-          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
-          <div class="ps-card"><div class="ps-line"></div><div class="ps-line"></div></div>
+          <div class="ps-card">
+            <div class="ps-card-row">
+              <div><div class="ps-line ps-stat-label"></div><div class="ps-line ps-stat-value"></div></div>
+              <div class="ps-line ps-stat-icon"></div>
+            </div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-card-row">
+              <div><div class="ps-line ps-stat-label"></div><div class="ps-line ps-stat-value"></div></div>
+              <div class="ps-line ps-stat-icon"></div>
+            </div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-card-row">
+              <div><div class="ps-line ps-stat-label"></div><div class="ps-line ps-stat-value"></div></div>
+              <div class="ps-line ps-stat-icon"></div>
+            </div>
+          </div>
+          <div class="ps-card">
+            <div class="ps-card-row">
+              <div><div class="ps-line ps-stat-label"></div><div class="ps-line ps-stat-value"></div></div>
+              <div class="ps-line ps-stat-icon"></div>
+            </div>
+          </div>
         </div>
         <div class="ps-list">
           <div class="ps-section-head">
@@ -326,11 +414,11 @@
           </div>
           <div class="ps-table">
             <div class="ps-table-head"></div>
-            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
-            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
+            <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
           </div>
         </div>
       </main>
