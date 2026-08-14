@@ -8,7 +8,11 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { HomeLoading } from "@/components/home-loading";
+import {
+  HomeLoading,
+  NodeContentLoading,
+  NodeMapLoading,
+} from "@/components/home-loading";
 import { UptimeProvider } from "@/components/live-uptime";
 import { NodeFilters } from "@/components/node-filters";
 import { SortControl } from "@/components/sort-control";
@@ -39,37 +43,29 @@ function loadNodeMap() {
   }));
 }
 
-const NodeCards = lazy(() =>
-  import("@/components/node-cards").then((module) => ({
+function loadNodeCards() {
+  return import("@/components/node-cards").then((module) => ({
     default: module.NodeCards,
-  })),
-);
-const NodeTable = lazy(() =>
-  import("@/components/node-table").then((module) => ({
-    default: module.NodeTable,
-  })),
-);
-const NodeMap = lazy(loadNodeMap);
-
-function NodeMapLoading() {
-  return (
-    <div
-      className="overflow-hidden rounded-lg border border-border bg-card shadow-xs"
-      aria-hidden="true"
-    >
-      <div className="border-b border-border/70 px-4 py-3.5">
-        <div className="km-skeleton h-5 w-28 rounded-md" />
-      </div>
-      <div className="bg-muted/15 px-2 py-3 sm:px-5 sm:py-4">
-        <div className="km-skeleton h-80 w-full rounded-md sm:h-105 lg:h-120" />
-      </div>
-    </div>
-  );
+  }));
 }
+
+function loadNodeTable() {
+  return import("@/components/node-table").then((module) => ({
+    default: module.NodeTable,
+  }));
+}
+
+const NodeCards = lazy(loadNodeCards);
+const NodeTable = lazy(loadNodeTable);
+const NodeMap = lazy(loadNodeMap);
 
 export function HomePage() {
   useLayoutEffect(() => {
-    document.documentElement.classList.remove("prerender-home");
+    document.documentElement.classList.remove(
+      "prerender-home",
+      "prerender-cards",
+      "prerender-map",
+    );
   }, []);
 
   const publicInfo = usePublicInfo();
@@ -117,6 +113,17 @@ export function HomePage() {
   }, [health.error, health.isError]);
 
   const activeView = view === "map" && !enableMap ? "table" : view;
+
+  useEffect(() => {
+    if (activeView === "table") {
+      void loadNodeTable();
+    } else if (activeView === "cards") {
+      void loadNodeCards();
+    } else {
+      void loadNodeMap();
+    }
+  }, [activeView]);
+
   const rows = useMemo(
     () => buildNodeRows(nodes.data ?? [], status.data),
     [nodes.data, status.data],
@@ -194,7 +201,10 @@ export function HomePage() {
             </p>
           </div>
           {loading ? (
-            <HomeLoading />
+            <HomeLoading
+              view={activeView}
+              rowCount={rows.length || undefined}
+            />
           ) : (
             <>
               {(settings?.showStats ?? true) ? (
@@ -278,7 +288,10 @@ export function HomePage() {
                       activeView === "map" ? (
                         <NodeMapLoading />
                       ) : (
-                        <HomeLoading />
+                        <NodeContentLoading
+                          view={activeView}
+                          rowCount={visible.length}
+                        />
                       )
                     }
                   >

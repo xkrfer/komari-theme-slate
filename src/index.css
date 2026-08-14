@@ -79,6 +79,7 @@
   --status-online: hsl(142 72% 29%);
   --status-offline: hsl(0 84% 60%);
   --data-accent: hsl(221 83% 53%);
+  --scrollbar-thumb: rgb(120 113 108 / 48%);
   --radius: 0.5rem;
   --sidebar: var(--card);
   --sidebar-foreground: var(--foreground);
@@ -117,6 +118,7 @@
   --status-online: hsl(142 71% 55%);
   --status-offline: hsl(0 91% 71%);
   --data-accent: hsl(217 91% 65%);
+  --scrollbar-thumb: rgb(168 162 158 / 52%);
   --sidebar: var(--card);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--primary);
@@ -140,9 +142,43 @@
     @apply font-sans;
     color-scheme: light;
     scrollbar-gutter: stable;
+    scrollbar-width: thin;
   }
   html.dark {
     color-scheme: dark;
+  }
+
+  html::-webkit-scrollbar {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    border: 0.125rem solid transparent;
+    border-radius: 9999px;
+    background: transparent;
+    background-clip: padding-box;
+  }
+
+  html::-webkit-scrollbar-thumb:hover,
+  html::-webkit-scrollbar-thumb:active {
+    background: var(--scrollbar-thumb);
+    background-clip: padding-box;
+  }
+
+  @supports (-moz-appearance: none) {
+    html {
+      scrollbar-color: transparent transparent;
+    }
+
+    html:hover,
+    html:focus-within {
+      scrollbar-color: var(--scrollbar-thumb) transparent;
+    }
   }
 
   :where(
@@ -220,7 +256,7 @@
 
   .km-node-card {
     content-visibility: auto;
-    contain-intrinsic-size: auto 27rem;
+    contain-intrinsic-size: auto 24rem;
   }
 
   .km-sort-icon {

@@ -23,6 +23,19 @@
         const root = document.documentElement;
         if (location.pathname === "/" || location.pathname === "/index.html") {
           root.classList.add("prerender-home");
+          try {
+            const storedView = localStorage.getItem("slate:view");
+            if (
+              storedView === "cards" ||
+              (!storedView && matchMedia("(max-width: 767px)").matches)
+            ) {
+              root.classList.add("prerender-cards");
+            } else if (storedView === "map") {
+              root.classList.add("prerender-map");
+            }
+          } catch {
+            // Use the table skeleton when storage is unavailable.
+          }
         }
         let appearance = "system";
         try {
@@ -38,6 +51,41 @@
       })();
     </script>
     <style>
+      html {
+        --ps-scrollbar-thumb: rgb(120 113 108 / 48%);
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+      }
+      html.dark {
+        --ps-scrollbar-thumb: rgb(168 162 158 / 52%);
+      }
+      html::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      html::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      html::-webkit-scrollbar-thumb {
+        border: 2px solid transparent;
+        border-radius: 999px;
+        background: transparent;
+        background-clip: padding-box;
+      }
+      html::-webkit-scrollbar-thumb:hover,
+      html::-webkit-scrollbar-thumb:active {
+        background: var(--ps-scrollbar-thumb);
+        background-clip: padding-box;
+      }
+      @supports (-moz-appearance: none) {
+        html {
+          scrollbar-color: transparent transparent;
+        }
+        html:hover,
+        html:focus-within {
+          scrollbar-color: var(--ps-scrollbar-thumb) transparent;
+        }
+      }
       #home-prerender {
         display: none;
       }
@@ -48,14 +96,17 @@
         --ps-muted: #f5f4f3;
         --ps-foreground: #1c1917;
         --ps-muted-foreground: #6f6863;
-        position: fixed;
+        position: absolute;
         z-index: 2147483647;
-        inset: 0;
+        inset: 0 0 auto;
         display: flex;
         min-height: 100svh;
-        overflow-y: auto;
         flex-direction: column;
         background: var(--ps-bg);
+      }
+      html.prerender-home #home-prerender::after {
+        content: "";
+        flex: 0 0 88px;
       }
       html.dark #home-prerender {
         --ps-bg: #171412;
@@ -74,8 +125,10 @@
       }
       .ps-header-inner,
       .ps-main {
-        width: min(100% - 32px, 1152px);
+        box-sizing: border-box;
+        width: min(100%, 1152px);
         margin-inline: auto;
+        padding-inline: 16px;
       }
       .ps-header-inner {
         display: flex;
@@ -218,7 +271,7 @@
         margin-top: 40px;
       }
       .ps-section-head {
-        min-height: 36px;
+        min-height: 46px;
         justify-content: space-between;
         margin-bottom: 16px;
       }
@@ -244,6 +297,59 @@
         border: 1px solid var(--ps-border);
         border-radius: 8px;
         background: var(--ps-card);
+      }
+      .ps-cards,
+      .ps-map {
+        display: none;
+      }
+      html.prerender-cards .ps-table,
+      html.prerender-map .ps-table {
+        display: none;
+      }
+      html.prerender-cards .ps-cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      html.prerender-map .ps-map {
+        display: block;
+      }
+      .ps-node-card {
+        box-sizing: border-box;
+        height: 384px;
+        padding: 16px;
+        border: 1px solid var(--ps-border);
+        border-radius: 8px;
+        background: var(--ps-card);
+      }
+      .ps-node-card .ps-line:nth-child(2) {
+        width: 72%;
+        margin-top: 28px;
+      }
+      .ps-node-card .ps-line:nth-child(3) {
+        width: 100%;
+        height: 64px;
+        margin-top: 28px;
+        border-radius: 6px;
+      }
+      .ps-node-card .ps-line:nth-child(4) {
+        width: 100%;
+        height: 40px;
+        margin-top: 84px;
+        border-radius: 6px;
+      }
+      .ps-map {
+        box-sizing: border-box;
+        height: 562px;
+        padding: 64px 20px 20px;
+        border: 1px solid var(--ps-border);
+        border-radius: 8px;
+        background: var(--ps-card);
+      }
+      .ps-map .ps-line {
+        width: 100%;
+        height: 100%;
+        border-radius: 6px;
       }
       .ps-table-head {
         height: 40px;
@@ -311,8 +417,22 @@
         .ps-row {
           grid-template-columns: repeat(4, minmax(0, 1fr));
         }
+        html.prerender-cards .ps-cards {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .ps-map {
+          height: 394px;
+        }
         .ps-cell:nth-child(n + 5) {
           display: none;
+        }
+      }
+      @media (min-width: 768px) and (max-width: 1023px) {
+        html.prerender-cards .ps-cards {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .ps-map {
+          height: 502px;
         }
       }
       @media (prefers-reduced-motion: reduce) {
@@ -420,6 +540,18 @@
             <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
             <div class="ps-row"><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div><div class="ps-cell"></div></div>
           </div>
+          <div class="ps-cards">
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+            <div class="ps-node-card"><div class="ps-line ps-line-title"></div><div class="ps-line"></div><div class="ps-line"></div><div class="ps-line"></div></div>
+          </div>
+          <div class="ps-map"><div class="ps-line"></div></div>
         </div>
       </main>
     </div>
