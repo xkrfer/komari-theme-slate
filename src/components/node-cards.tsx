@@ -9,6 +9,7 @@ import {
   MemoryStick,
 } from "lucide-react";
 import type { ComponentType } from "react";
+import { LiveUptime } from "@/components/live-uptime";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -145,6 +146,7 @@ type NodeCardOptions = {
   showResourceTotals: boolean;
   showTraffic: boolean;
   showSwap: boolean;
+  showUptime: boolean;
 };
 
 export function NodeCards({
@@ -240,6 +242,15 @@ export function NodeCards({
                       )}
                     />
                     {row.online ? t("online") : t("offline")}
+                    {row.online && options.showUptime ? (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <LiveUptime
+                          uptime={row.uptime}
+                          reportedAt={row.status?.time}
+                        />
+                      </>
+                    ) : null}
                   </span>
                 </CardTitle>
                 <div

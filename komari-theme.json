@@ -52,7 +52,22 @@
         "name": { "zh-CN": "节点默认排序", "en": "Default node sort" },
         "type": "select",
         "options": "name,status,region,uptime,cpu,memory,disk,speed",
-        "default": "name"
+        "default": "name",
+        "help": {
+          "zh-CN": "访客未设置本地排序字段时使用",
+          "en": "Used when the visitor has no locally stored sort field"
+        }
+      },
+      {
+        "key": "defaultSortDirection",
+        "name": { "zh-CN": "默认排序方向", "en": "Default sort direction" },
+        "type": "select",
+        "options": "asc,desc",
+        "default": "asc",
+        "help": {
+          "zh-CN": "访客未设置本地排序方向时使用",
+          "en": "Used when the visitor has no locally stored sort direction"
+        }
       },
       {
         "type": "title",
@@ -76,7 +91,7 @@
       },
       {
         "type": "title",
-        "name": { "zh-CN": "节点卡片", "en": "Node cards" }
+        "name": { "zh-CN": "节点列表", "en": "Node list" }
       },
       {
         "key": "showCardTags",
@@ -110,6 +125,29 @@
         "name": { "zh-CN": "显示 Swap 指标", "en": "Show Swap metric" },
         "type": "switch",
         "default": true
+      },
+      {
+        "key": "showUptime",
+        "name": { "zh-CN": "显示运行时间", "en": "Show uptime" },
+        "type": "switch",
+        "default": true,
+        "help": {
+          "zh-CN": "同时控制表格运行时间列和卡片运行时间",
+          "en": "Controls uptime in both the table and node cards"
+        }
+      },
+      {
+        "key": "uptimeRefreshSeconds",
+        "name": {
+          "zh-CN": "运行时间刷新间隔（秒）",
+          "en": "Uptime refresh interval (seconds)"
+        },
+        "type": "number",
+        "default": 1,
+        "help": {
+          "zh-CN": "允许 1–60 秒，超出范围时回退为 1 秒",
+          "en": "Accepts 1–60 seconds; invalid values fall back to 1 second"
+        }
       },
       {
         "type": "title",

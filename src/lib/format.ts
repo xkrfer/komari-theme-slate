@@ -1,3 +1,5 @@
+import { t } from "@/lib/i18n";
+
 export function formatBytes(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) {
     return "0 B";
@@ -22,4 +24,20 @@ export function formatMs(value: number | null): string {
     return "—";
   }
   return `${Math.round(value)} ms`;
+}
+
+export function formatUptime(uptime: number | null): string {
+  if (uptime === null || !Number.isFinite(uptime)) {
+    return "—";
+  }
+  const seconds = Math.max(0, Math.floor(uptime));
+  const days = Math.floor(seconds / 86_400);
+  if (days > 0) {
+    return t("days").replace("{count}", String(days));
+  }
+  const hours = Math.floor(seconds / 3_600);
+  const minutes = Math.floor((seconds % 3_600) / 60);
+  return [hours, minutes]
+    .map((value) => String(value).padStart(2, "0"))
+    .join(":");
 }

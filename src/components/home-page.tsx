@@ -2,11 +2,12 @@ import { AlertTriangle, ServerOff } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { HomeLoading } from "@/components/home-loading";
+import { UptimeProvider } from "@/components/live-uptime";
 import { NodeCards } from "@/components/node-cards";
 import { NodeFilters } from "@/components/node-filters";
 import { NodeMap } from "@/components/node-map";
 import { NodeTable } from "@/components/node-table";
-import { SortControl, type SortDirection } from "@/components/sort-control";
+import { SortControl } from "@/components/sort-control";
 import { StatsStrip, type StatusFilter } from "@/components/stats-strip";
 import { ViewSwitcher } from "@/components/view-switcher";
 import {
@@ -20,7 +21,13 @@ import {
 import { t } from "@/lib/i18n";
 import { buildNodeRows } from "@/lib/nodes";
 import { isRpcUnavailable } from "@/lib/rpc";
-import type { HomeView, NodeSort } from "@/lib/schemas";
+import type { HomeView, NodeSort, SortDirection } from "@/lib/schemas";
+import {
+  readStoredSort,
+  readStoredSortDirection,
+  writeStoredSort,
+  writeStoredSortDirection,
+} from "@/lib/sort";
 import { readStoredView, resolveHomeView, writeStoredView } from "@/lib/view";
 
 export function HomePage() {
@@ -35,13 +42,21 @@ export function HomePage() {
   const managedView = settings?.defaultView ?? "table";
   const enableMap = settings?.enableMap ?? true;
   const managedSort = settings?.defaultSort ?? "name";
+  const managedSortDirection = settings?.defaultSortDirection ?? "asc";
+  const showUptime = settings?.showUptime ?? true;
+  const uptimeRefreshSeconds = settings?.uptimeRefreshSeconds ?? 1;
   const [view, setView] = useState<HomeView>(() =>
     resolveHomeView(managedView, enableMap),
   );
   const [group, setGroup] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [sort, setSort] = useState<NodeSort>("name");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [sortOverride, setSortOverride] = useState<NodeSort | null>(
+    readStoredSort,
+  );
+  const [sortDirectionOverride, setSortDirectionOverride] =
+    useState<SortDirection | null>(readStoredSortDirection);
+  const sort = sortOverride ?? managedSort;
+  const sortDirection = sortDirectionOverride ?? managedSortDirection;
 
   useEffect(() => {
     setView((currentView) => {
@@ -54,10 +69,6 @@ export function HomePage() {
       return currentView;
     });
   }, [enableMap, managedView]);
-
-  useEffect(() => {
-    setSort(managedSort);
-  }, [managedSort]);
 
   useEffect(() => {
     if (health.isError && isRpcUnavailable(health.error)) {
@@ -97,6 +108,9 @@ export function HomePage() {
       return (a - b) * direction;
     };
     return filtered.toSorted((a, b) => {
+      if (statusFilter === "all" && a.online !== b.online) {
+        return a.online ? -1 : 1;
+      }
       if (sort === "name") {
         return a.name.localeCompare(b.name) * direction;
       }
@@ -125,120 +139,130 @@ export function HomePage() {
   const loading = nodes.isPending || publicInfo.isPending || status.isPending;
 
   return (
-    <main className="km-page-home km-main mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-10 sm:py-14">
-      <section>
-        <div className="mb-6">
-          <p className="mb-1 text-sm font-semibold text-foreground">
-            <span aria-hidden="true" className="mr-1.5">
-              👋
-            </span>
-            {t("overview")}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {publicInfo.data?.description || t("overviewFallback")}
-          </p>
-        </div>
-        {loading ? (
-          <HomeLoading />
-        ) : (
-          <>
-            {(settings?.showStats ?? true) ? (
-              <StatsStrip
-                rows={rows}
-                statusFilter={statusFilter}
-                onStatusFilterChange={setStatusFilter}
-              />
-            ) : null}
-            <section className={(settings?.showStats ?? true) ? "mt-10" : ""}>
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                  <h2 className="text-base font-semibold tracking-tight">
-                    {t("nodes")}
-                  </h2>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {t("nodeListDescription")}
-                  </p>
+    <UptimeProvider enabled={showUptime} intervalSeconds={uptimeRefreshSeconds}>
+      <main className="km-page-home km-main mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-10 sm:py-14">
+        <section>
+          <div className="mb-6">
+            <p className="mb-1 text-sm font-semibold text-foreground">
+              <span aria-hidden="true" className="mr-1.5">
+                👋
+              </span>
+              {t("overview")}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {publicInfo.data?.description || t("overviewFallback")}
+            </p>
+          </div>
+          {loading ? (
+            <HomeLoading />
+          ) : (
+            <>
+              {(settings?.showStats ?? true) ? (
+                <StatsStrip
+                  rows={rows}
+                  statusFilter={statusFilter}
+                  onStatusFilterChange={setStatusFilter}
+                />
+              ) : null}
+              <section className={(settings?.showStats ?? true) ? "mt-10" : ""}>
+                <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+                  <div>
+                    <h2 className="text-base font-semibold tracking-tight">
+                      {t("nodes")}
+                    </h2>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      {t("nodeListDescription")}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {activeView === "map" ? null : (
+                      <>
+                        <NodeFilters
+                          groups={groups}
+                          group={group}
+                          onGroupChange={setGroup}
+                        />
+                        <SortControl
+                          value={sort}
+                          direction={sortDirection}
+                          onChange={(nextSort) => {
+                            writeStoredSort(nextSort);
+                            setSortOverride(nextSort);
+                          }}
+                          onDirectionChange={(nextDirection) => {
+                            writeStoredSortDirection(nextDirection);
+                            setSortDirectionOverride(nextDirection);
+                          }}
+                        />
+                      </>
+                    )}
+                    <ViewSwitcher
+                      value={activeView}
+                      showMap={enableMap}
+                      onChange={(next) => {
+                        writeStoredView(next);
+                        setView(next);
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {activeView === "map" ? null : (
-                    <>
-                      <NodeFilters
-                        groups={groups}
-                        group={group}
-                        onGroupChange={setGroup}
-                      />
-                      <SortControl
-                        value={sort}
-                        direction={sortDirection}
-                        onChange={setSort}
-                        onDirectionChange={setSortDirection}
-                      />
-                    </>
-                  )}
-                  <ViewSwitcher
-                    value={activeView}
-                    showMap={enableMap}
-                    onChange={(next) => {
-                      writeStoredView(next);
-                      setView(next);
+
+                {error ? (
+                  <div className="flex min-h-56 flex-col items-center justify-center rounded-lg border border-dashed border-destructive/25 bg-destructive/3 px-6 text-center">
+                    <span className="mb-3 flex size-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                      <AlertTriangle className="size-5" />
+                    </span>
+                    <p className="text-sm font-medium">{t("loadError")}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t("retryHint")}
+                    </p>
+                  </div>
+                ) : visible.length === 0 ? (
+                  <div className="flex min-h-56 flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/50 px-6 text-center">
+                    <span className="mb-3 flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                      <ServerOff className="size-5" />
+                    </span>
+                    <p className="text-sm font-medium">
+                      {rows.length > 0 ? t("filteredEmpty") : t("noNodes")}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t("noNodesDescription")}
+                    </p>
+                  </div>
+                ) : activeView === "table" ? (
+                  <NodeTable
+                    rows={visible}
+                    sortKey={`${sort}:${sortDirection}`}
+                    showUptime={showUptime}
+                  />
+                ) : activeView === "cards" ? (
+                  <NodeCards
+                    rows={visible}
+                    sortKey={`${sort}:${sortDirection}`}
+                    options={{
+                      showTags: settings?.showCardTags ?? true,
+                      showPrice:
+                        (settings?.showCardBilling ?? true) &&
+                        (Boolean(me.data?.logged_in) ||
+                          Boolean(settings?.guestShowPrice)),
+                      showExpiration:
+                        (settings?.showCardBilling ?? true) &&
+                        (Boolean(me.data?.logged_in) ||
+                          Boolean(settings?.guestShowExpiration)),
+                      showResourceTotals: settings?.showResourceTotals ?? true,
+                      showTraffic: settings?.showCardTraffic ?? true,
+                      showSwap: settings?.showCardSwap ?? true,
+                      showUptime,
                     }}
                   />
-                </div>
-              </div>
-
-              {error ? (
-                <div className="flex min-h-56 flex-col items-center justify-center rounded-lg border border-dashed border-destructive/25 bg-destructive/3 px-6 text-center">
-                  <span className="mb-3 flex size-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-                    <AlertTriangle className="size-5" />
-                  </span>
-                  <p className="text-sm font-medium">{t("loadError")}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {t("retryHint")}
-                  </p>
-                </div>
-              ) : visible.length === 0 ? (
-                <div className="flex min-h-56 flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/50 px-6 text-center">
-                  <span className="mb-3 flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                    <ServerOff className="size-5" />
-                  </span>
-                  <p className="text-sm font-medium">
-                    {rows.length > 0 ? t("filteredEmpty") : t("noNodes")}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {t("noNodesDescription")}
-                  </p>
-                </div>
-              ) : activeView === "table" ? (
-                <NodeTable
-                  rows={visible}
-                  sortKey={`${sort}:${sortDirection}`}
-                />
-              ) : activeView === "cards" ? (
-                <NodeCards
-                  rows={visible}
-                  sortKey={`${sort}:${sortDirection}`}
-                  options={{
-                    showTags: settings?.showCardTags ?? true,
-                    showPrice:
-                      (settings?.showCardBilling ?? true) &&
-                      (Boolean(me.data?.logged_in) ||
-                        Boolean(settings?.guestShowPrice)),
-                    showExpiration:
-                      (settings?.showCardBilling ?? true) &&
-                      (Boolean(me.data?.logged_in) ||
-                        Boolean(settings?.guestShowExpiration)),
-                    showResourceTotals: settings?.showResourceTotals ?? true,
-                    showTraffic: settings?.showCardTraffic ?? true,
-                    showSwap: settings?.showCardSwap ?? true,
-                  }}
-                />
-              ) : (
-                <NodeMap rows={visible} />
-              )}
-            </section>
-          </>
-        )}
-      </section>
-    </main>
+                ) : (
+                  <NodeMap rows={visible} />
+                )}
+              </section>
+            </>
+          )}
+        </section>
+      </main>
+    </UptimeProvider>
   );
 }

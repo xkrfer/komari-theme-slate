@@ -9,9 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { t } from "@/lib/i18n";
-import type { NodeSort } from "@/lib/schemas";
-
-export type SortDirection = "asc" | "desc";
+import type { NodeSort, SortDirection } from "@/lib/schemas";
 
 function getSortLabel(value: NodeSort) {
   if (value === "name") return t("sortName");

@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-table/legacy";
 import { Server } from "lucide-react";
 import { type ReactNode, useMemo } from "react";
+import { LiveUptime } from "@/components/live-uptime";
 import { Progress } from "@/components/ui/progress";
 import { formatSpeed } from "@/lib/format";
 import { t } from "@/lib/i18n";
@@ -14,6 +15,27 @@ import { regionToFlagEmoji } from "@/lib/region";
 import { cn } from "@/lib/utils";
 
 const columnHelper = legacyCreateColumnHelper<NodeRow>();
+
+const TABLE_COLUMNS_WITH_UPTIME = [
+  { id: "name", width: "24%" },
+  { id: "status", width: "6%" },
+  { id: "system", width: "6%" },
+  { id: "uptime", width: "9%" },
+  { id: "cpu", width: "11%" },
+  { id: "memory", width: "11%" },
+  { id: "disk", width: "11%" },
+  { id: "speed", width: "22%" },
+] as const;
+
+const TABLE_COLUMNS_WITHOUT_UPTIME = [
+  { id: "name", width: "23%" },
+  { id: "status", width: "6%" },
+  { id: "system", width: "6%" },
+  { id: "cpu", width: "14%" },
+  { id: "memory", width: "14%" },
+  { id: "disk", width: "14%" },
+  { id: "speed", width: "23%" },
+] as const;
 
 const SYSTEM_ICON_MAPPINGS = [
   ["almalinux", "fl-almalinux"],
@@ -96,18 +118,14 @@ function UsageCell({ value }: { value: number | null }) {
   );
 }
 
-function formatUptime(uptime: number | null) {
-  if (uptime === null || !Number.isFinite(uptime)) return "—";
-  if (uptime < 86_400) return t("lessThanOneDay");
-  return t("days").replace("{count}", String(Math.floor(uptime / 86_400)));
-}
-
 export function NodeTable({
   rows,
   sortKey,
+  showUptime,
 }: {
   rows: NodeRow[];
   sortKey: string;
+  showUptime: boolean;
 }) {
   const columns = useMemo(
     () => [
@@ -186,14 +204,20 @@ export function NodeTable({
           );
         },
       }),
-      columnHelper.accessor("uptime", {
-        header: t("colUptime"),
-        cell: (info) => (
-          <span className="text-xs text-foreground">
-            {formatUptime(info.getValue())}
-          </span>
-        ),
-      }),
+      ...(showUptime
+        ? [
+            columnHelper.accessor("uptime", {
+              header: t("colUptime"),
+              cell: (info) => (
+                <LiveUptime
+                  uptime={info.getValue()}
+                  reportedAt={info.row.original.status?.time}
+                  className="text-xs text-foreground"
+                />
+              ),
+            }),
+          ]
+        : []),
       columnHelper.accessor("cpuUsage", {
         header: t("cpu"),
         cell: (info) => <UsageCell value={info.getValue()} />,
@@ -220,7 +244,7 @@ export function NodeTable({
         ),
       }),
     ],
-    [],
+    [showUptime],
   );
 
   const table = useLegacyTable({
@@ -233,14 +257,12 @@ export function NodeTable({
     <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-xs">
       <table className="km-ui-table w-full min-w-220 table-fixed text-left text-sm">
         <colgroup>
-          <col className="w-[23%]" />
-          <col className="w-[6%]" />
-          <col className="w-[6%]" />
-          <col className="w-[10%]" />
-          <col className="w-[11%]" />
-          <col className="w-[11%]" />
-          <col className="w-[11%]" />
-          <col className="w-[22%]" />
+          {(showUptime
+            ? TABLE_COLUMNS_WITH_UPTIME
+            : TABLE_COLUMNS_WITHOUT_UPTIME
+          ).map((column) => (
+            <col key={column.id} style={{ width: column.width }} />
+          ))}
         </colgroup>
         <thead className="bg-muted/50 text-xs text-muted-foreground">
           {table.getHeaderGroups().map((headerGroup) => (

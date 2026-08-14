@@ -16,6 +16,7 @@ export const nodeSortSchema = z.enum([
   "disk",
   "speed",
 ]);
+export const sortDirectionSchema = z.enum(["asc", "desc"]);
 
 export const themeSettingsSchema = z
   .object({
@@ -23,6 +24,7 @@ export const themeSettingsSchema = z
     defaultView: homeViewSchema.optional().default("table"),
     defaultLanguage: defaultLanguageSchema.optional().default("auto"),
     defaultSort: nodeSortSchema.optional().default("name"),
+    defaultSortDirection: sortDirectionSchema.optional().default("asc"),
     showStats: z.boolean().optional().default(true),
     enableMap: z.boolean().optional().default(true),
     showCardTags: z.boolean().optional().default(true),
@@ -30,6 +32,14 @@ export const themeSettingsSchema = z
     showResourceTotals: z.boolean().optional().default(true),
     showCardTraffic: z.boolean().optional().default(true),
     showCardSwap: z.boolean().optional().default(true),
+    showUptime: z.boolean().optional().default(true),
+    uptimeRefreshSeconds: z.coerce
+      .number()
+      .min(1)
+      .max(60)
+      .catch(1)
+      .optional()
+      .default(1),
     guestShowPrice: z.boolean().optional().default(false),
     guestShowExpiration: z.boolean().optional().default(false),
   })
@@ -211,6 +221,7 @@ export type Appearance = z.infer<typeof appearanceSchema>;
 export type HomeView = z.infer<typeof homeViewSchema>;
 export type DefaultLanguage = z.infer<typeof defaultLanguageSchema>;
 export type NodeSort = z.infer<typeof nodeSortSchema>;
+export type SortDirection = z.infer<typeof sortDirectionSchema>;
 export type ThemeSettings = z.infer<typeof themeSettingsSchema>;
 export type PublicInfo = z.infer<typeof publicInfoSchema>;
 export type MeInfo = z.infer<typeof meInfoSchema>;

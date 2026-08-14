@@ -95,12 +95,12 @@ These are for local development and packaging only. After the theme is deployed 
 
 | Group | Settings |
 | --- | --- |
-| General | Default appearance, view, language, and node sort |
+| General | Default appearance, view, language, node sort, and sort direction |
 | Home page | Summary cards and map view |
-| Node cards | Tags, billing, resource totals, network traffic, and Swap |
+| Node list | Tags, billing, resource totals, network traffic, Swap, uptime, and its refresh interval |
 | Guest display | Prices and expiration status |
 
-Visitor choices for appearance, language, and view are stored locally (`appearance`, `language`, `slate:view`) and take priority afterwards. Guest prices and expiration status are hidden by default; signed-in users are unaffected by those two settings. Disabling the map automatically falls back from a stored map view to an available view.
+Visitor choices for appearance, language, view, and node sorting are stored locally (`appearance`, `language`, `slate:view`, `slate:sort`, `slate:sort-direction`) and take priority on later visits. Without a stored sort preference, nodes are displayed using the admin-managed default immediately. Guest prices and expiration status are hidden by default; signed-in users are unaffected by those two settings. Disabling the map automatically falls back from a stored map view to an available view.
 
 ## Build and package
 
